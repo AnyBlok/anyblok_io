@@ -5,7 +5,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.blok import Blok, BlokManager
+from anyblok.blok import Blok
 from anyblok.release import version
 
 
@@ -14,16 +14,10 @@ class AnyBlokIOCSV(Blok):
     """
     version = version
     author = 'Suzanne Jean-Sébastien'
-    logo = '../anyblok-logo_alpha_256.png'
 
     required = [
         'anyblok-io',
     ]
-
-    def __init__(self, registry):
-        super(AnyBlokIOCSV, self).__init__(registry)
-        if not BlokManager.has_importer('csv'):
-            BlokManager.add_importer('csv', 'Model.IO.Importer.CSV')
 
     @classmethod
     def import_declaration_module(cls):
