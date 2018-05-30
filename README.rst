@@ -21,7 +21,11 @@
 .. image:: https://readthedocs.org/projects/anyblok_io/badge/?version=latest
     :alt: Documentation Status
     :scale: 100%
-    :target: https://doc.anyblok.org/en/latest/?badge=latest
+    :target: https://anyblok-io.readthedocs.io/en/latest/?badge=latest
 
 AnyBlok
 =======
+
+Add Importer and Exporter behaviour for AnyBlok
+
+See the `latest documentation <https://anyblok-io.readthedocs.io/en/latest/>`_
