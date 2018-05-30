@@ -11,7 +11,7 @@ API doc
 
 **exceptions**
 
-.. automodule:: anyblok.bloks.io_csv.exceptions
+.. automodule:: anyblok_io.bloks.io_csv.exceptions
 
 .. autoexception:: CSVImporterException
     :members:
@@ -25,7 +25,7 @@ API doc
 
 **mixin**
 
-.. automodule:: anyblok.bloks.io_csv.mixin
+.. automodule:: anyblok_io.bloks.io_csv.mixin
 
 .. autoanyblok-declaration:: IOCSVFieldMixin
     :members:
@@ -39,7 +39,7 @@ API doc
 
 **importer**
 
-.. automodule:: anyblok.bloks.io_csv.importer
+.. automodule:: anyblok_io.bloks.io_csv.importer
 
 .. autoanyblok-declaration:: Importer
     :members:
@@ -53,7 +53,7 @@ API doc
 
 **exporter**
 
-.. automodule:: anyblok.bloks.io_csv.exporter
+.. automodule:: anyblok_io.bloks.io_csv.exporter
 
 .. autoanyblok-declaration:: Exporter
     :members:

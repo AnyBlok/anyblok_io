@@ -11,7 +11,7 @@ API doc
 
 **exceptions**
 
-.. automodule:: anyblok.bloks.io_xml.exceptions
+.. automodule:: anyblok_io.bloks.io_xml.exceptions
 
 .. autoexception:: XMLImporterException
     :members:
@@ -25,7 +25,7 @@ API doc
 
 **importer**
 
-.. automodule:: anyblok.bloks.io_xml.importer
+.. automodule:: anyblok_io.bloks.io_xml.importer
 
 .. autoanyblok-declaration:: Importer
     :members:
@@ -39,7 +39,7 @@ API doc
 
 **exporter**
 
-.. automodule:: anyblok.bloks.io_xml.exporter
+.. automodule:: anyblok_io.bloks.io_xml.exporter
 
 .. autoanyblok-declaration:: Exporter
     :members:

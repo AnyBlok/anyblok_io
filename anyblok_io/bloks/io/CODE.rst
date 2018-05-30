@@ -11,7 +11,7 @@ API doc
 
 **exceptions**
 
-.. automodule:: anyblok.bloks.io.exceptions
+.. automodule:: anyblok_io.bloks.io.exceptions
 
 .. autoexception:: IOException
     :members:
@@ -45,7 +45,7 @@ API doc
 
 **core**
 
-.. automodule:: anyblok.bloks.io.core
+.. automodule:: anyblok_io.bloks.io.core
 
 .. autoanyblok-declaration:: Query
     :members:
@@ -59,7 +59,7 @@ API doc
 
 **mapping**
 
-.. automodule:: anyblok.bloks.io.mapping
+.. automodule:: anyblok_io.bloks.io.mapping
 
 .. autoanyblok-declaration:: Mapping
     :members:
@@ -68,7 +68,7 @@ API doc
 
 **mixin**
 
-.. automodule:: anyblok.bloks.io.mixin
+.. automodule:: anyblok_io.bloks.io.mixin
 
 .. autoanyblok-declaration:: IOMixin
     :members:
@@ -77,7 +77,7 @@ API doc
 
 **importer**
 
-.. automodule:: anyblok.bloks.io.importer
+.. automodule:: anyblok_io.bloks.io.importer
 
 .. autoanyblok-declaration:: Importer
     :members:
@@ -86,7 +86,7 @@ API doc
 
 **exporter**
 
-.. automodule:: anyblok.bloks.io.exporter
+.. automodule:: anyblok_io.bloks.io.exporter
 
 .. autoanyblok-declaration:: Exporter
     :members:
@@ -95,7 +95,7 @@ API doc
 
 **formater**
 
-.. automodule:: anyblok.bloks.io.formater
+.. automodule:: anyblok_io.bloks.io.formater
 
 .. autoanyblok-declaration:: Formater
     :members:
