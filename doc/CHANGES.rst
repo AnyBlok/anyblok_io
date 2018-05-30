@@ -9,7 +9,7 @@
 CHANGELOG
 =========
 
-1.0.0
-------
+1.0.0 (2018-05-30)
+------------------
 
 * Cherry pick io bloks from AnyBlok distribution
