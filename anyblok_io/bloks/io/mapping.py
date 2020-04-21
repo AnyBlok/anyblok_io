@@ -9,6 +9,7 @@ from anyblok.declarations import Declarations, hybrid_method
 from anyblok.column import String, Json
 from .exceptions import IOMappingCheckException, IOMappingSetException
 from logging import getLogger
+from uuid import UUID
 logger = getLogger(__name__)
 
 
@@ -56,7 +57,7 @@ class Mapping:
         """ Delete all the keys for this model
 
         :param model: model of the mapping
-        :param \*keys: list of the key
+        :param keys: list of the key
         :rtype: Boolean True if the mappings are removed
         """
         mapping_only = kwargs.get('mapping_only', True)
@@ -151,6 +152,11 @@ class Mapping:
                     pks, model, key))
 
         cls.check_primary_keys(model, *pks.keys())
+
+        for pk, value in pks.items():
+            if isinstance(value, UUID):
+                pks[pk] = str(value)
+
         vals = dict(model=model, key=key, primary_key=pks)
         if blokname is not None:
             vals['blokname'] = blokname
