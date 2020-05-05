@@ -157,8 +157,7 @@ class XML:
                 except Exception as e:
                     self._raise(e, **kwargs)
         elif if_does_not_exist == 'create':
-                return_entry = self.create_entry(
-                    Model, values, two_way, **kwargs)
+            return_entry = self.create_entry(Model, values, two_way, **kwargs)
 
         self.map_imported_entry(
             model, param, external_id, two_way, return_entry,

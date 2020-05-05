@@ -38,4 +38,4 @@ class XML:
         return cls.registry.IO.Exporter.insert(**kwargs)
 
     def run(self, entries):
-        raise NotImplemented
+        raise NotImplementedError
