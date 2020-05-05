@@ -14,15 +14,14 @@ class TestBlokRequired:
     @pytest.fixture(autouse=True)
     def transact(self, request, registry_testblok):
         transaction = registry_testblok.begin_nested()
+        registry_testblok.begin_nested()  # cause of commit
         request.addfinalizer(transaction.rollback)
         return
 
     def test_import_file_csv(self, registry_testblok):
-        registry = registry_testblok
-        registry.upgrade(install=('test-io-blok1',))
-        assert registry.Exemple.query().count() == 3
+        registry_testblok.upgrade(install=('test-io-blok1',))
+        assert registry_testblok.Exemple.query().count() == 3
 
     def test_import_file_xml(self, registry_testblok):
-        registry = registry_testblok
-        registry.upgrade(install=('test-io-blok2',))
-        assert registry.Exemple.query().count() == 3
+        registry_testblok.upgrade(install=('test-io-blok2',))
+        assert registry_testblok.Exemple.query().count() == 3
