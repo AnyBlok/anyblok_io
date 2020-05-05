@@ -5,14 +5,13 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.tests.testcase import BlokTestCase
 from ..exceptions import CSVImporterException
 from os import urandom
 from csv import DictReader
 from io import StringIO
 
 
-class TestImportCSV(BlokTestCase):
+class TestImportCSV:
 
     def create_importer(self, file_to_import=None, **kwargs):
         CSV = self.registry.IO.Importer.CSV

@@ -5,13 +5,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.tests.testcase import BlokTestCase
 from ..exceptions import XMLImporterException
 from lxml import etree
 from os import urandom
 
 
-class TestImportCSV(BlokTestCase):
+class TestImportCSV:
 
     def create_importer(self, file_to_import=None, **kwargs):
         XML = self.registry.IO.Importer.XML
