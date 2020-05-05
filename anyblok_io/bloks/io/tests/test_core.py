@@ -5,19 +5,24 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
+import pytest
 
 
+@pytest.mark.usefixtures('rollback_registry')
 class TestIOCore:
+
+    @pytest.fixture(autouse=True)
+    def transact(self, rollback_registry):
+        self.registry = rollback_registry
 
     def checkExist(self):
         Mapping = self.registry.IO.Mapping
-        self.assertTrue(
-            Mapping.query().filter_by(
-                key='test', model='Model.System.Blok').count())
+        assert Mapping.query().filter_by(
+            key='test', model='Model.System.Blok').count()
 
     def checkUnExist(self):
         Mapping = self.registry.IO.Mapping
-        self.assertFalse(
+        assert not (
             Mapping.query().filter_by(
                 key='test', model='Model.System.Blok').count())
 
