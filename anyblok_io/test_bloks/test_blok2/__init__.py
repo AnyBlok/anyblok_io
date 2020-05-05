@@ -19,10 +19,6 @@ class TestBlok(BlokImporter, Blok):
     def import_declaration_module(cls):
         from . import test  # noqa
 
-    @classmethod
-    def reload_declaration_module(cls, reload):
-        from . import test
-        reload(test)
-
     def update(self, latest_version):
-        self.import_file_xml('Model.Exemple', 'file.xml')
+        self.import_file_xml('Model.Exemple', 'file.xml',
+                             commit_at_each_grouped=False)

@@ -9,13 +9,6 @@ from anyblok import Declarations
 from anyblok.column import Integer, String
 
 
-@Declarations.register(Declarations.Model.IO)
-class Importer:
-
-    def commit(self):
-        pass
-
-
 @Declarations.register(Declarations.Model)
 class Exemple:
     id = Integer(primary_key=True)

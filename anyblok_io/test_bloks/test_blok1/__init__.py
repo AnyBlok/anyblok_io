@@ -18,10 +18,6 @@ class TestBlok(BlokImporter, Blok):
     def import_declaration_module(cls):
         from . import test  # noqa
 
-    @classmethod
-    def reload_declaration_module(cls, reload):
-        from . import test
-        reload(test)
-
     def update(self, latest_version):
-        self.import_file_csv('Model.Exemple', 'file.csv')
+        self.import_file_csv('Model.Exemple', 'file.csv',
+                             commit_at_each_grouped=False)
