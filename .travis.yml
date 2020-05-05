@@ -18,7 +18,7 @@ services:
 
 install:
   - pip install -U pip wheel 
-  - pip install anyblok
+  - pip install anyblok psycopg2
   - pip install flake8 coverage pytest pytest-cov
   - pip install colour passlib furl phonenumbers pycountry  # special columns
   - pip install -U cryptography
