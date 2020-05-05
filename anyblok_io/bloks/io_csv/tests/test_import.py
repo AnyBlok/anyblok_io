@@ -5,13 +5,19 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
+import pytest
 from ..exceptions import CSVImporterException
 from os import urandom
 from csv import DictReader
 from io import StringIO
 
 
+@pytest.mark.usefixtures('rollback_registry')
 class TestImportCSV:
+
+    @pytest.fixture(autouse=True)
+    def transact(self, rollback_registry):
+        self.registry = rollback_registry
 
     def create_importer(self, file_to_import=None, **kwargs):
         CSV = self.registry.IO.Importer.CSV
@@ -32,23 +38,23 @@ class TestImportCSV:
     def test_commit_if_error_found(self):
         importer = self.create_csv_importer()
         importer.error_found.append('Mock error')
-        self.assertEqual(importer.commit(), False)
+        assert importer.commit() is False
 
     def test_commit(self):
         importer = self.create_csv_importer()
         csvfile = StringIO()
         importer.reader = DictReader(csvfile)
-        self.assertEqual(importer.commit(), True)
+        assert importer.commit() is True
 
     def test_get_reader(self):
         importer = self.create_csv_importer(
             file_to_import=self.get_file_to_import())
         importer.get_reader()
-        self.assertEqual(isinstance(importer.reader, DictReader), True)
+        assert isinstance(importer.reader, DictReader) is True
 
     def assertNbLines(self, importer, nb_line_wanted):
         rows = [row for row in importer.reader]
-        self.assertEqual(len(rows), nb_line_wanted)
+        assert len(rows) == nb_line_wanted
 
     def test_consume_without_offset(self):
         importer = self.create_csv_importer(
@@ -87,11 +93,11 @@ class TestImportCSV:
             file_to_import=self.get_file_to_import())
         importer.get_reader()
         rows = importer.consume_nb_grouped_lines()
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0], {'A': '1', 'B': '2', 'C': '3'})
+        assert len(rows) == 1
+        assert rows[0] == {'A': '1', 'B': '2', 'C': '3'}
         rows = importer.consume_nb_grouped_lines()
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0], {'A': '4', 'B': '5', 'C': '6'})
+        assert len(rows) == 1
+        assert rows[0] == {'A': '4', 'B': '5', 'C': '6'}
 
     def test_consume_nb_grouped_lines_same_number(self):
         importer = self.create_csv_importer(
@@ -99,9 +105,9 @@ class TestImportCSV:
             file_to_import=self.get_file_to_import())
         importer.get_reader()
         rows = importer.consume_nb_grouped_lines()
-        self.assertEqual(len(rows), 2)
-        self.assertEqual(rows[0], {'A': '1', 'B': '2', 'C': '3'})
-        self.assertEqual(rows[1], {'A': '4', 'B': '5', 'C': '6'})
+        assert len(rows) == 2
+        assert rows[0] == {'A': '1', 'B': '2', 'C': '3'}
+        assert rows[1] == {'A': '4', 'B': '5', 'C': '6'}
 
     def test_consume_nb_group_lines_greater_than_nb_lines(self):
         importer = self.create_csv_importer(
@@ -109,9 +115,9 @@ class TestImportCSV:
             file_to_import=self.get_file_to_import())
         importer.get_reader()
         rows = importer.consume_nb_grouped_lines()
-        self.assertEqual(len(rows), 2)
-        self.assertEqual(rows[0], {'A': '1', 'B': '2', 'C': '3'})
-        self.assertEqual(rows[1], {'A': '4', 'B': '5', 'C': '6'})
+        assert len(rows) == 2
+        assert rows[0] == {'A': '1', 'B': '2', 'C': '3'}
+        assert rows[1] == {'A': '4', 'B': '5', 'C': '6'}
 
     def get_exporter_file_to_import(self, withmapping=False):
         if not withmapping:
@@ -161,13 +167,13 @@ class TestImportCSV:
             file_to_import=self.get_exporter_file_to_import())
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, [])
-        self.assertEqual(importer.header_external_id, None)
-        self.assertEqual(importer.header_external_ids, {})
-        self.assertEqual(len(importer.fields_description.keys()), 2)
+        assert importer.header_pks == []
+        assert importer.header_external_id is None
+        assert importer.header_external_ids == {}
+        assert len(importer.fields_description.keys()) == 2
         for header in ('mode', 'model'):
-            self.assertIn(header, importer.fields_description.keys())
-            self.assertIn(header, importer.header_fields)
+            assert header in importer.fields_description.keys()
+            assert header in importer.header_fields
 
     def test_get_header_with_pks(self):
         importer = self.create_csv_importer(
@@ -175,15 +181,15 @@ class TestImportCSV:
             model='Model.System.Model')
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, ['name'])
-        self.assertEqual(importer.header_external_id, None)
-        self.assertEqual(importer.header_external_ids, {})
-        self.assertEqual(len(importer.fields_description.keys()), 2)
+        assert importer.header_pks == ['name']
+        assert importer.header_external_id is None
+        assert importer.header_external_ids == {}
+        assert len(importer.fields_description.keys()) == 2
         for header in ('name', 'table'):
-            self.assertIn(header, importer.fields_description.keys())
+            assert header in importer.fields_description.keys()
 
-        self.assertNotIn('name', importer.header_fields)
-        self.assertIn('table', importer.header_fields)
+        assert 'name' not in importer.header_fields
+        assert 'table' in importer.header_fields
 
     def test_get_header_with_multi_pks(self):
         importer = self.create_csv_importer(
@@ -191,15 +197,15 @@ class TestImportCSV:
             model='Model.System.Column')
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, ['model', 'name'])
-        self.assertEqual(importer.header_external_id, None)
-        self.assertEqual(importer.header_external_ids, {})
-        self.assertEqual(len(importer.fields_description.keys()), 3)
+        assert importer.header_pks == ['model', 'name']
+        assert importer.header_external_id is None
+        assert importer.header_external_ids == {}
+        assert len(importer.fields_description.keys()) == 3
         for header in ('model', 'name', 'nullable'):
-            self.assertIn(header, importer.fields_description.keys())
+            assert header in importer.fields_description.keys()
 
-        self.assertNotIn('name', importer.header_fields)
-        self.assertIn('nullable', importer.header_fields)
+        assert 'name' not in importer.header_fields
+        assert 'nullable' in importer.header_fields
 
     def test_get_header_with_pks_mapping(self):
         importer = self.create_csv_importer(
@@ -207,15 +213,15 @@ class TestImportCSV:
             model='Model.System.Model')
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, [])
-        self.assertEqual(importer.header_external_id, 'name/EXTERNAL_ID')
-        self.assertEqual(importer.header_external_ids, {})
-        self.assertEqual(len(importer.fields_description.keys()), 2)
+        assert importer.header_pks == []
+        assert importer.header_external_id == 'name/EXTERNAL_ID'
+        assert importer.header_external_ids == {}
+        assert len(importer.fields_description.keys()) == 2
         for header in ('name', 'table'):
-            self.assertIn(header, importer.fields_description.keys())
+            assert header in importer.fields_description.keys()
 
-        self.assertNotIn('name', importer.header_fields)
-        self.assertIn('table', importer.header_fields)
+        assert 'name' not in importer.header_fields
+        assert 'table' in importer.header_fields
 
     def test_get_header_with_pks_mapping_short_external_id(self):
         importer = self.create_csv_importer(
@@ -224,13 +230,13 @@ class TestImportCSV:
             model='Model.System.Model')
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, [])
-        self.assertEqual(importer.header_external_id, '/EXTERNAL_ID')
-        self.assertEqual(importer.header_external_ids, {})
-        self.assertEqual(len(importer.fields_description.keys()), 1)
-        self.assertIn('table', importer.fields_description.keys())
-        self.assertNotIn('name', importer.header_fields)
-        self.assertIn('table', importer.header_fields)
+        assert importer.header_pks == []
+        assert importer.header_external_id == '/EXTERNAL_ID'
+        assert importer.header_external_ids == {}
+        assert len(importer.fields_description.keys()) == 1
+        assert 'table' in importer.fields_description.keys()
+        assert 'name' not in importer.header_fields
+        assert 'table' in importer.header_fields
 
     def test_get_header_with_multi_pks_mapping(self):
         importer = self.create_csv_importer(
@@ -238,31 +244,30 @@ class TestImportCSV:
             model='Model.System.Column')
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, [])
-        self.assertEqual(importer.header_external_id, 'name/EXTERNAL_ID')
-        self.assertEqual(importer.header_external_ids, {})
-        self.assertEqual(len(importer.fields_description.keys()), 3)
+        assert importer.header_pks == []
+        assert importer.header_external_id == 'name/EXTERNAL_ID'
+        assert importer.header_external_ids == {}
+        assert len(importer.fields_description.keys()) == 3
         for header in ('model', 'name', 'nullable'):
-            self.assertIn(header, importer.fields_description.keys())
+            assert header in importer.fields_description.keys()
 
-        self.assertNotIn('name', importer.header_fields)
-        self.assertIn('nullable', importer.header_fields)
+        assert 'name' not in importer.header_fields
+        assert 'nullable' in importer.header_fields
 
     def test_get_header_with_mapping(self):
         importer = self.create_csv_importer(
             file_to_import=self.get_exporter_file_to_import(withmapping=True))
         importer.get_reader()
         importer.get_header()
-        self.assertEqual(importer.header_pks, [])
-        self.assertEqual(importer.header_external_id, None)
-        self.assertEqual(importer.header_external_ids,
-                         {'model/EXTERNAL_ID': 'model'})
-        self.assertEqual(len(importer.fields_description.keys()), 2)
+        assert importer.header_pks == []
+        assert importer.header_external_id is None
+        assert importer.header_external_ids == {'model/EXTERNAL_ID': 'model'}
+        assert len(importer.fields_description.keys()) == 2
         for header in ('model', 'mode'):
-            self.assertIn(header, importer.fields_description.keys())
+            assert header in importer.fields_description.keys()
 
-        self.assertNotIn('model', importer.header_fields)
-        self.assertIn('mode', importer.header_fields)
+        assert 'model' not in importer.header_fields
+        assert 'mode' in importer.header_fields
 
     def test_parse_row_on_error_raise(self):
         Importer = self.registry.IO.Importer
@@ -271,7 +276,7 @@ class TestImportCSV:
         importer.header_fields = ['model', 'mode']
         importer.fields_description = Importer.fields_description(
             fields=importer.header_fields)
-        with self.assertRaises(CSVImporterException):
+        with pytest.raises(CSVImporterException):
             importer.parse_row({'mode': 'Model.IO.Exporter.CSV'})
 
     def test_parse_row(self):
@@ -282,9 +287,9 @@ class TestImportCSV:
             fields=importer.header_fields)
         importer.parse_row({'model': 'Model.IO.Importer',
                             'mode': 'Model.IO.Exporter.CSV'})
-        self.assertEqual(len(importer.created_entries), 1)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 1
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
 
     def test_parse_row_with_raise(self):
         Importer = self.registry.IO.Importer
@@ -295,9 +300,9 @@ class TestImportCSV:
             fields=importer.header_fields)
         importer.parse_row({'model': 'Model.IO.Importer',
                             'mode': 'Model.IO.Exporter.CSV'})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 1)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 1
 
     def test_parse_row_with_pass(self):
         Importer = self.registry.IO.Importer
@@ -308,9 +313,9 @@ class TestImportCSV:
             fields=importer.header_fields)
         importer.parse_row({'model': 'Model.IO.Importer',
                             'mode': 'Model.IO.Exporter.CSV'})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
 
     def test_parse_row_with_existing_pks_update(self):
         Model = self.registry.System.Model
@@ -322,11 +327,10 @@ class TestImportCSV:
         Model.insert(name='Model.IO.Test', table='io_test')
         importer.parse_row({'name': 'Model.IO.Test',
                             'table': 'io_test_other_table'})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 1)
-        self.assertEqual(len(importer.error_found), 0)
-        self.assertEqual(importer.updated_entries[0].table,
-                         'io_test_other_table')
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 1
+        assert len(importer.error_found) == 0
+        assert importer.updated_entries[0].table == 'io_test_other_table'
 
     def test_parse_row_with_existing_pks_create(self):
         Exporter = self.registry.IO.Exporter
@@ -340,9 +344,9 @@ class TestImportCSV:
         importer.parse_row({'id': str(exporter.id),
                             'model': 'Model.System.Model',
                             'mode': "Model.IO.Exporter.CSV"})
-        self.assertEqual(len(importer.created_entries), 1)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 1
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
 
     def test_parse_row_with_existing_pks_pass(self):
         Model = self.registry.System.Model
@@ -355,9 +359,9 @@ class TestImportCSV:
         Model.insert(name='Model.IO.Test', table='io_test')
         importer.parse_row({'name': 'Model.IO.Test',
                             'table': 'io_test_other_table'})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
 
     def test_parse_row_with_existing_pks_raise(self):
         Model = self.registry.System.Model
@@ -370,9 +374,9 @@ class TestImportCSV:
         Model.insert(name='Model.IO.Test', table='io_test')
         importer.parse_row({'name': 'Model.IO.Test',
                             'table': 'io_test_other_table'})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 1)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 1
 
     def test_parse_row_with_unexting_multi_pks(self):
         Column = self.registry.System.Column
@@ -384,9 +388,9 @@ class TestImportCSV:
         importer.parse_row({'name': 'test',
                             'model': 'Model.System.Model',
                             'nullable': True})
-        self.assertEqual(len(importer.created_entries), 1)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 1
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
 
     def test_parse_row_with_mapping_pks(self):
         Model = self.registry.System.Model
@@ -399,11 +403,10 @@ class TestImportCSV:
         self.registry.IO.Mapping.set('import_mapping', model)
         importer.parse_row({'name/EXTERNAL_ID': 'import_mapping',
                             'table': 'io_test_other_table'})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 1)
-        self.assertEqual(len(importer.error_found), 0)
-        self.assertEqual(importer.updated_entries[0].table,
-                         'io_test_other_table')
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 1
+        assert len(importer.error_found) == 0
+        assert importer.updated_entries[0].table == 'io_test_other_table'
 
     def test_parse_row_with_unexisting_mapping_pks(self):
         Exporter = self.registry.IO.Exporter
@@ -415,13 +418,13 @@ class TestImportCSV:
         importer.parse_row({'id/EXTERNAL_ID': 'import_mapping',
                             'model': 'Model.IO.Exporter',
                             'mode': 'Model.IO.Exporter.CSV'})
-        self.assertEqual(len(importer.created_entries), 1)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 1
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
         exporter = self.registry.IO.Mapping.get('Model.IO.Exporter',
                                                 'import_mapping')
-        self.assertEqual(exporter.mode, 'Model.IO.Exporter.CSV')
-        self.assertEqual(exporter.model, 'Model.IO.Exporter')
+        assert exporter.mode == 'Model.IO.Exporter.CSV'
+        assert exporter.model == 'Model.IO.Exporter'
 
     def test_parse_row_with_mapping(self):
         Model = self.registry.System.Model
@@ -439,10 +442,10 @@ class TestImportCSV:
         importer.parse_row({'id': str(exporter.id),
                             'model/EXTERNAL_ID': 'import_mapping',
                             'mode': "Model.IO.Exporter.CSV"})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 1)
-        self.assertEqual(len(importer.error_found), 0)
-        self.assertEqual(importer.updated_entries[0].model, 'Model.IO.Test')
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 1
+        assert len(importer.error_found) == 0
+        assert importer.updated_entries[0].model == 'Model.IO.Test'
 
     def test_parse_row_with_unexisting_mapping(self):
         Importer = self.registry.IO.Importer
@@ -455,31 +458,31 @@ class TestImportCSV:
         importer.parse_row({'id': str(importer.importer.id),
                             'model/EXTERNAL_ID': 'import_mapping',
                             'mode': "Model.IO.Importer.CSV"})
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 1)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 1
 
     def test_run(self):
         importer = self.create_csv_importer(
             model='Model.IO.Exporter',
             file_to_import=self.get_exporter_file_to_import())
         importer.run()
-        self.assertEqual(len(importer.created_entries), 1)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 0)
+        assert len(importer.created_entries) == 1
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 0
 
     def test_run_raise_at_end(self):
         importer = self.create_csv_importer()
-        with self.assertRaises(CSVImporterException):
+        with pytest.raises(CSVImporterException):
             importer.run()
 
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 1)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 1
 
     def test_run_raise_ignored(self):
         importer = self.create_csv_importer(csv_on_error='ignore')
         importer.run()
-        self.assertEqual(len(importer.created_entries), 0)
-        self.assertEqual(len(importer.updated_entries), 0)
-        self.assertEqual(len(importer.error_found), 1)
+        assert len(importer.created_entries) == 0
+        assert len(importer.updated_entries) == 0
+        assert len(importer.error_found) == 1
