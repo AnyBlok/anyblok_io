@@ -6,19 +6,23 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.tests.testcase import DBTestCase
+import pytest
 
 
-class TestBlokRequired(DBTestCase):
+class TestBlokRequired:
 
-    blok_entry_points = ('bloks', 'test_bloks')
+    @pytest.fixture(autouse=True)
+    def transact(self, request, registry_testblok):
+        transaction = registry_testblok.begin_nested()
+        request.addfinalizer(transaction.rollback)
+        return
 
-    def test_import_file_csv(self):
-        registry = self.init_registry(None)
+    def test_import_file_csv(self, registry_testblok):
+        registry = registry_testblok
         registry.upgrade(install=('test-io-blok1',))
-        self.assertEqual(registry.Exemple.query().count(), 3)
+        assert registry.Exemple.query().count() == 3
 
-    def test_import_file_xml(self):
-        registry = self.init_registry(None)
+    def test_import_file_xml(self, registry_testblok):
+        registry = registry_testblok
         registry.upgrade(install=('test-io-blok2',))
-        self.assertEqual(registry.Exemple.query().count(), 3)
+        assert registry.Exemple.query().count() == 3
