@@ -5,12 +5,17 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.tests.testcase import BlokTestCase
+import pytest
 from ..exceptions import CSVExporterException
 from csv import DictReader
 
 
-class TestExportCSV(BlokTestCase):
+@pytest.mark.usefixtures('rollback_registry')
+class TestExportCSV:
+
+    @pytest.fixture(autouse=True)
+    def transact(self, rollback_registry):
+        self.registry = rollback_registry
 
     def create_exporter(self, Model, **kwargs):
         Exporter = self.registry.IO.Exporter.CSV
@@ -18,49 +23,49 @@ class TestExportCSV(BlokTestCase):
 
     def test_create_exporter_by_registry_name(self):
         exporter = self.create_exporter('Model.IO.Exporter')
-        self.assertEqual(exporter.model, 'Model.IO.Exporter')
+        assert exporter.model == 'Model.IO.Exporter'
 
     def test_create_exporter_by_model(self):
         exporter = self.create_exporter(self.registry.IO.Exporter)
-        self.assertEqual(exporter.model, 'Model.IO.Exporter')
+        assert exporter.model == 'Model.IO.Exporter'
 
     def test_create_exporter_with_field(self):
         fields = [{'name': 'model'}]
         exporter = self.create_exporter(self.registry.IO.Exporter,
                                         fields=fields)
-        self.assertEqual(exporter.model, 'Model.IO.Exporter')
-        self.assertEqual(len(exporter.fields_to_export), 1)
-        self.assertEqual(exporter.fields_to_export[0].name, 'model')
+        assert exporter.model == 'Model.IO.Exporter'
+        assert len(exporter.fields_to_export) == 1
+        assert exporter.fields_to_export[0].name == 'model'
 
     def test_create_exporter_with_two_fields(self):
         fields = [{'name': 'model'}, {'name': 'csv_delimiter'}]
         exporter = self.create_exporter(self.registry.IO.Exporter,
                                         fields=fields)
-        self.assertEqual(exporter.model, 'Model.IO.Exporter')
-        self.assertEqual(len(exporter.fields_to_export), 2)
+        assert exporter.model == 'Model.IO.Exporter'
+        assert len(exporter.fields_to_export) == 2
 
     def test_get_header_from_fields_any(self):
         fields = [{'name': 'id'}]
         exporter = self.create_exporter(self.registry.IO.Exporter,
                                         fields=fields)
         res = exporter.get_model(exporter.mode)(exporter).get_header()
-        self.assertEqual(len(res), 1)
-        self.assertEqual(res[0], 'id')
+        assert len(res) == 1
+        assert res[0] == 'id'
 
     def test_get_header_from_fields_external_id(self):
         fields = [{'name': 'id', 'mode': 'external_id'}]
         exporter = self.create_exporter(self.registry.IO.Exporter,
                                         fields=fields)
         res = exporter.get_model(exporter.mode)(exporter).get_header()
-        self.assertEqual(len(res), 1)
-        self.assertEqual(res[0], 'id/EXTERNAL_ID')
+        assert len(res) == 1
+        assert res[0] == 'id/EXTERNAL_ID'
 
     def test_format_field_with_mapping_any(self):
         Exporter = self.registry.IO.Exporter
         fields = [{'name': 'id'}]
         exporter = self.create_exporter(Exporter, fields=fields)
         res = exporter.fields_to_export[0].value2str(exporter, exporter)
-        self.assertEqual(res, str(exporter.id))
+        assert res == str(exporter.id)
 
     def test_format_field_with_mapping_external_id(self):
         Exporter = self.registry.IO.Exporter
@@ -70,13 +75,13 @@ class TestExportCSV(BlokTestCase):
         key = key.split('_')
         key = '_'.join([key[0], str(int(key[1]) + 1)])
         res = exporter.fields_to_export[0].value2str(exporter, exporter)
-        self.assertEqual(res, key)
+        assert res == key
 
     def test_format_field_with_forbidden_mapping_external_id(self):
         Exporter = self.registry.IO.Exporter
         fields = [{'name': 'id.other', 'mode': 'external_id'}]
         exporter = self.create_exporter(Exporter, fields=fields)
-        with self.assertRaises(CSVExporterException):
+        with pytest.raises(CSVExporterException):
             exporter.fields_to_export[0].value2str(exporter, exporter)
 
     def test_format_browsed_field_with_mapping_any(self):
@@ -84,14 +89,14 @@ class TestExportCSV(BlokTestCase):
         fields = [{'name': 'model.is_sql_model'}]
         exporter = self.create_exporter(Exporter, fields=fields)
         res = exporter.fields_to_export[0].value2str(exporter, exporter)
-        self.assertEqual(res, '1')
+        assert res == '1'
 
     def test_format_browsed_field_pks_without_mapping_key(self):
         Exporter = self.registry.IO.Exporter
         fields = [{'name': 'model.name'}]
         exporter = self.create_exporter(Exporter, fields=fields)
         res = exporter.fields_to_export[0].value2str(exporter, exporter)
-        self.assertEqual(res, 'Model.IO.Exporter')
+        assert res == 'Model.IO.Exporter'
 
     def test_format_browsed_field_with_mapping_key(self):
         Exporter = self.registry.IO.Exporter
@@ -101,7 +106,7 @@ class TestExportCSV(BlokTestCase):
             name=Exporter.__registry_name__)
         key = self.registry.IO.Exporter.get_key_mapping(model)
         res = exporter.fields_to_export[0].value2str(exporter, exporter)
-        self.assertEqual(res, key)
+        assert res == key
 
     def test_export_anyblok_core(self):
         Blok = self.registry.System.Blok
@@ -115,9 +120,9 @@ class TestExportCSV(BlokTestCase):
                             quotechar=exporter.csv_quotechar)
         rows = [x for x in reader]
         csvfile.close()
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0]['name/EXTERNAL_ID'], key)
-        self.assertEqual(rows[0]['state'], 'installed')
+        assert len(rows) == 1
+        assert rows[0]['name/EXTERNAL_ID'] == key
+        assert rows[0]['state'] == 'installed'
 
     def test_export_all_bloks(self):
         Blok = self.registry.System.Blok

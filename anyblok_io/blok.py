@@ -36,8 +36,8 @@ class BlokImporter:
         :param importer_name: Name of the importer (need installation of the
                               Blok which have the importer)
         :param model: Model of the data to import
-        :param \*file_path: relative path of the path in this Blok
-        :param \*\*kwargs: Option for the importer
+        :param file_path: relative path of the path in this Blok
+        :param kwargs: Option for the importer
         :rtype: return dict of result
         """
         blok_path = BlokManager.getPath(self.name)

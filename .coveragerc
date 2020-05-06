@@ -1,0 +1,14 @@
+[run]
+omit =
+    # omit anything in a tests directory anywhere
+    */tests/*
+    # omit anything in a test_bloks directory anywhere
+    anyblok_io/test_bloks/*
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # unexecuting logger
+    logger\.
+    # exclude all import error of unloaded module
+    except ImportError:

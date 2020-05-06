@@ -5,10 +5,15 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.tests.testcase import BlokTestCase
+import pytest
 
 
-class TestImporter(BlokTestCase):
+@pytest.mark.usefixtures('rollback_registry')
+class TestImporter:
+
+    @pytest.fixture(autouse=True)
+    def transact(self, rollback_registry):
+        self.registry = rollback_registry
 
     def create_importer(self, **kwargs):
         Importer = self.registry.IO.Importer
@@ -23,12 +28,12 @@ class TestImporter(BlokTestCase):
 
     def test_commit_if_check(self):
         importer = self.create_importer(check_import=True)
-        self.assertEqual(importer.commit(), False)
+        assert importer.commit() is False
 
     def test_commit_if_not_commit_at_each_group(self):
         importer = self.create_importer(commit_at_each_grouped=False)
-        self.assertEqual(importer.commit(), False)
+        assert importer.commit() is False
 
     def test_commit(self):
         importer = self.create_importer()
-        self.assertEqual(importer.commit(), True)
+        assert importer.commit() is True
