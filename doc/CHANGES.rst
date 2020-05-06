@@ -9,6 +9,15 @@
 CHANGELOG
 =========
 
+1.1.0
+-----
+
+* Removed **Python 3.4** capability
+* Removed **Python 3.5** capability
+* Refactored unittest, replaced nose by pytest
+* Fixed #1 added hook to render primary key serializable
+
+
 1.0.0 (2018-05-30)
 ------------------
 

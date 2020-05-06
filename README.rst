@@ -28,4 +28,15 @@ AnyBlok
 
 Add Importer and Exporter behaviour for AnyBlok
 
+
++--------------------+----------------+----------------------------------------+
+| Blok               | Dependencies   | Description                            |
++====================+================+========================================+
+| **anyblok-io**     |                | Add base model to do export and import |
++--------------------+----------------+----------------------------------------+
+| **anyblok-io-csv** | **anyblok-io** | CSV file.                              |
++--------------------+----------------+----------------------------------------+
+| **anyblok-io-xml** | **anyblok-io** | XML file                               |
++--------------------+----------------+----------------------------------------+
+
 See the `latest documentation <https://anyblok-io.readthedocs.io/en/latest/>`_
