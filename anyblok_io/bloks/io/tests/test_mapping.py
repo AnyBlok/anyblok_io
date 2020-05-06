@@ -7,6 +7,37 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 import pytest
 from ..exceptions import IOMappingSetException
+from uuid import uuid1
+from datetime import date, datetime
+from decimal import Decimal
+
+try:
+    import colour
+    has_colour = True
+except Exception:
+    has_colour = False
+
+
+try:
+    import furl  # noqa
+    has_furl = True
+except Exception:
+    has_furl = False
+
+
+try:
+    import phonenumbers  # noqa
+    has_phonenumbers = True
+    from sqlalchemy_utils import PhoneNumber as PN
+except Exception:
+    has_phonenumbers = False
+
+
+try:
+    import pycountry  # noqa
+    has_pycountry = True
+except Exception:
+    has_pycountry = False
 
 
 @pytest.mark.usefixtures('rollback_registry')
@@ -277,3 +308,40 @@ class TestIOMapping:
         removed = self.Mapping.delete_for_blokname(
             'Test', self.registry.System.Column)
         assert removed == nb_column
+
+    def test_convert_primary_key_uuid(self):
+        uuid = uuid1()
+        assert self.Mapping.convert_primary_key(uuid) == str(uuid)
+
+    def test_convert_primary_key_date(self):
+        today = date.today()
+        assert self.Mapping.convert_primary_key(today) == today.isoformat()
+
+    def test_convert_primary_key_datetime(self):
+        now = datetime.now()
+        assert self.Mapping.convert_primary_key(now) == now.isoformat()
+
+    def test_convert_primary_key_decimal(self):
+        assert self.Mapping.convert_primary_key(Decimal('1')) == '1'
+
+    @pytest.mark.skipif(not has_furl, reason="furl is not installed")
+    def test_convert_primary_key_furl(self):
+        url = 'http://doc.anyblok.org'
+        assert self.Mapping.convert_primary_key(furl.furl(url)) == url
+
+    @pytest.mark.skipif(not has_phonenumbers,
+                        reason="phonenumbers is not installed")
+    def test_convert_primary_key_phonenumber(self):
+        phone = PN("+120012301", None)
+        assert self.Mapping.convert_primary_key(phone) == "+1 20012301"
+
+    @pytest.mark.skipif(not has_pycountry, reason="pycountry is not installed")
+    def test_convert_primary_key_country(self):
+        country = pycountry.countries.get(alpha_2='FR')
+        assert self.Mapping.convert_primary_key(country) == "FRA"
+
+    @pytest.mark.skipif(not has_colour,
+                        reason="colour is not installed")
+    def test_convert_primary_key_color(self):
+        color = '#f5f5f5'
+        assert self.Mapping.convert_primary_key(colour.Color(color)) == color

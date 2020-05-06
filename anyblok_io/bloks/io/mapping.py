@@ -7,12 +7,43 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok.declarations import Declarations, hybrid_method
 from anyblok.column import String, Json
+from datetime import datetime, date
+from decimal import Decimal
 from .exceptions import IOMappingCheckException, IOMappingSetException
 from logging import getLogger
 from uuid import UUID
+
+
+try:
+    import colour
+    has_colour = True
+except Exception:
+    has_colour = False
+
+
+try:
+    import furl  # noqa
+    has_furl = True
+except Exception:
+    has_furl = False
+
+
+try:
+    import phonenumbers  # noqa
+    has_phonenumbers = True
+    from sqlalchemy_utils import PhoneNumber as PN
+except Exception:
+    has_phonenumbers = False
+
+
+try:
+    import pycountry  # noqa
+    has_pycountry = True
+except Exception:
+    has_pycountry = False
+
+
 logger = getLogger(__name__)
-
-
 register = Declarations.register
 Model = Declarations.Model
 
@@ -128,6 +159,31 @@ class Mapping:
                         pk, pks, model))
 
     @classmethod
+    def convert_primary_key(cls, value):
+        if isinstance(value, UUID):
+            return str(value)
+
+        if isinstance(value, (date, datetime)):
+            return value.isoformat()
+
+        if isinstance(value, Decimal):
+            return str(value)
+
+        if has_colour and isinstance(value, colour.Color):
+            return value.hex
+
+        if has_furl and isinstance(value, furl.furl):
+            return str(value)
+
+        if has_pycountry and value.__class__.__name__ == 'Country':
+            return value.alpha_3
+
+        if has_phonenumbers and isinstance(value, PN):
+            return value.international
+
+        return value
+
+    @classmethod
     def set_primary_keys(cls, model, key, pks, raiseifexist=True,
                          blokname=None):
         """ Add or update a mmping with a model and a external key
@@ -154,8 +210,7 @@ class Mapping:
         cls.check_primary_keys(model, *pks.keys())
 
         for pk, value in pks.items():
-            if isinstance(value, UUID):
-                pks[pk] = str(value)
+            pks[pk] = cls.convert_primary_key(value)
 
         vals = dict(model=model, key=key, primary_key=pks)
         if blokname is not None:
