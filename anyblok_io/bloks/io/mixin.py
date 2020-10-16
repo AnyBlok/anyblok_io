@@ -15,7 +15,7 @@ class IOMixin:
     id = Integer(primary_key=True)
     mode = Selection(selections="get_mode_choices", nullable=False)
     model = String(foreign_key=Declarations.Model.System.Model.use('name'),
-                   nullable=False)
+                   nullable=False, size=256)
 
     @classmethod
     def get_mode_choices(cls):

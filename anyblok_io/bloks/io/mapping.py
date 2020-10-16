@@ -52,7 +52,7 @@ Model = Declarations.Model
 class Mapping:
 
     key = String(primary_key=True)
-    model = String(primary_key=True,
+    model = String(primary_key=True, size=256,
                    foreign_key=Model.System.Model.use('name'))
     primary_key = Json(nullable=False)
     blokname = String(label="Blok name",
