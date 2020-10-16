@@ -9,6 +9,13 @@
 CHANGELOG
 =========
 
+1.1.1
+-----
+
+* Fixed the size of the fields **model**, because they have a
+  foreign key to the model  **Model.System.Model** on the field
+  **name**. The next version of AnyBlok check that the size are the same
+
 1.1.0 (2020-05-06)
 ------------------
 
