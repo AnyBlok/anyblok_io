@@ -93,7 +93,7 @@ class CSV:
 
     def get_header(self):
         headers = self.reader.fieldnames
-        Model = self.registry.get(self.importer.model)
+        Model = self.anyblok.get(self.importer.model)
         self.fields_description = Model.fields_description(
             fields=[h.split('/')[0] for h in headers])
 
@@ -129,7 +129,7 @@ class CSV:
                     row, entry.to_primary_keys()))
 
     def _parse_row_if_not_entry(self, row, pks, values, Model):
-        Mapping = self.registry.IO.Mapping
+        Mapping = self.anyblok.IO.Mapping
         if self.importer.csv_if_does_not_exist == 'create':
             if pks:
                 values.update(**pks)
@@ -153,7 +153,7 @@ class CSV:
     def parse_row(self, row):
         try:
             entry = pks = None
-            Model = self.registry.get(self.importer.model)
+            Model = self.anyblok.get(self.importer.model)
             values = {}
             for field in self.header_fields:
                 ctype = self.fields_description[field]['type']
@@ -227,4 +227,4 @@ class CSV:
         if quotechar is not None:
             kwargs['csv_quotechar'] = quotechar
 
-        return cls.registry.IO.Importer.insert(**kwargs)
+        return cls.anyblok.IO.Importer.insert(**kwargs)

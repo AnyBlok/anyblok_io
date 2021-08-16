@@ -35,7 +35,7 @@ class XML:
             if not isinstance(kwargs['model'], str):
                 kwargs['model'] = kwargs['model'].__registry_name__
 
-        return cls.registry.IO.Exporter.insert(**kwargs)
+        return cls.anyblok.IO.Exporter.insert(**kwargs)
 
     def run(self, entries):
         raise NotImplementedError

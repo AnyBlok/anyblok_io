@@ -22,7 +22,7 @@ class Exporter(Declarations.Mixin.IOMixin):
 
     @classmethod
     def get_external_id(cls, model):
-        Sequence = cls.registry.System.Sequence
+        Sequence = cls.anyblok.System.Sequence
         seq_code = 'export.%s' % model
         query = Sequence.query().filter(Sequence.code == seq_code)
         if query.count():
@@ -34,7 +34,7 @@ class Exporter(Declarations.Mixin.IOMixin):
 
     @classmethod
     def get_key_mapping(cls, entry):
-        Mapping = cls.registry.IO.Mapping
+        Mapping = cls.anyblok.IO.Mapping
         mapping = Mapping.get_from_entry(entry)
         if mapping:
             return mapping.key

@@ -58,7 +58,7 @@ class XML:
             if (model, external_id) in self.two_way_external_id:
                 return self.two_way_external_id[(model, external_id)]
 
-            entry = self.registry.IO.Mapping.get(model, external_id)
+            entry = self.anyblok.IO.Mapping.get(model, external_id)
             if entry:
                 return entry
 
@@ -94,7 +94,7 @@ class XML:
             # temporaly deactivate auto flush to let time
             # orm to fill the remote column with foreign_key
             # which should be not null
-            with self.registry.session.no_autoflush:
+            with self.anyblok.session.no_autoflush:
                 getattr(entry, field).extend(inValues[field])
 
     def create_entry(self, Model, values, two_way, **kwargs):
@@ -129,15 +129,15 @@ class XML:
                         model, external_id)] = entry
                 else:
                     raiseifexist = if_exist != 'overwrite'
-                    self.registry.IO.Mapping.set(external_id, entry,
-                                                 blokname=self.blokname,
-                                                 raiseifexist=raiseifexist)
+                    self.anyblok.IO.Mapping.set(external_id, entry,
+                                                blokname=self.blokname,
+                                                raiseifexist=raiseifexist)
 
     def import_entry(self, entry, values, model=None, external_id=None,
                      param=None, if_exist=if_exist,
                      if_does_not_exist=if_does_not_exist,
                      two_way=False, **kwargs):
-        Model = self.registry.get(model)
+        Model = self.anyblok.get(model)
         return_entry = entry
         if entry:
             if if_exist == 'continue':
@@ -260,7 +260,7 @@ class XML:
                 record.tag, kwargs), **_kw)
             return None
 
-        Model = self.registry.get(kwargs['model'])
+        Model = self.anyblok.get(kwargs['model'])
         fields_description = Model.fields_description()
         values = {}
         for field in record.getchildren():
@@ -369,4 +369,4 @@ class XML:
         if not isinstance(kwargs['model'], str):
             kwargs['model'] = kwargs['model'].__registry_name__
 
-        return cls.registry.IO.Importer.insert(**kwargs)
+        return cls.anyblok.IO.Importer.insert(**kwargs)

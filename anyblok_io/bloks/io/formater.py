@@ -22,7 +22,7 @@ class Formater:
         return value
 
     def _externalIdStr2value(self, value, model):
-        mapping = self.registry.IO.Mapping.get(model, value)
+        mapping = self.anyblok.IO.Mapping.get(model, value)
         if mapping is None:
             raise FormaterException(
                 "Unexisting mapping key %r with model %r" % (value, model))
@@ -45,8 +45,8 @@ class Formater:
         return str(value)
 
     def externalIdValue2str(self, value, model):
-        Model = self.registry.get(model)
-        Mapping = self.registry.IO.Mapping
+        Model = self.anyblok.get(model)
+        Mapping = self.anyblok.IO.Mapping
         pks = Model.get_primary_keys()
         if len(pks) > 1:
             raise FormaterException(
@@ -57,7 +57,7 @@ class Formater:
 
         if mapping is None:
             entry = Model.from_primary_keys(**pks)
-            key = self.registry.IO.Exporter.get_external_id(model)
+            key = self.anyblok.IO.Exporter.get_external_id(model)
             Mapping.set(key, entry)
             return key
 
@@ -154,7 +154,7 @@ class DateTime(IO.Formater):
 class Many2One(IO.Formater):
 
     def str2value(self, value, model):
-        Model = self.registry.get(model)
+        Model = self.anyblok.get(model)
         if not value:
             return None
 
@@ -185,7 +185,7 @@ class Many2One(IO.Formater):
         if value is None:
             return ''
 
-        Exporter = self.registry.IO.Exporter
+        Exporter = self.anyblok.IO.Exporter
         return Exporter.get_key_mapping(value)
 
 
@@ -198,7 +198,7 @@ class One2One(IO.Formater.Many2One):
 class Many2Many(IO.Formater):
 
     def str2value(self, value, model):
-        Model = self.registry.get(model)
+        Model = self.anyblok.get(model)
         if not value:
             return None
 
@@ -228,7 +228,7 @@ class Many2Many(IO.Formater):
         if not values:
             return dumps([])
 
-        Exporter = self.registry.IO.Exporter
+        Exporter = self.anyblok.IO.Exporter
         return dumps([Exporter.get_key_mapping(value) for value in values])
 
 

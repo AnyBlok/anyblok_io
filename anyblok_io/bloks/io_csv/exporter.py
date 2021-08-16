@@ -56,7 +56,7 @@ class Field(Mixin.IOCSVFieldMixin):
     def _value2str(self, exporter, name, entry, external_id):
         fields_description = self._get_fields_description(name, entry)
         if fields_description['primary_key'] and external_id:
-            return self.registry.IO.Exporter.get_key_mapping(entry)
+            return self.anyblok.IO.Exporter.get_key_mapping(entry)
 
         ctype = fields_description['type']
         model = fields_description['model']
@@ -70,7 +70,7 @@ class Field(Mixin.IOCSVFieldMixin):
 
         elif fields_description['model']:
             model = fields_description['model']
-            Model = self.registry.get(model)
+            Model = self.anyblok.get(model)
             pks = Model.get_primary_keys()
             if len(pks) == 1:
                 pks = {pks[0]: getattr(entry, name)}
@@ -125,12 +125,12 @@ class CSV:
         if quotechar is not None:
             kwargs['csv_quotechar'] = quotechar
 
-        exporter = cls.registry.IO.Exporter.insert(**kwargs)
+        exporter = cls.anyblok.IO.Exporter.insert(**kwargs)
         if fields:
             for field in fields:
                 field['exporter'] = exporter
 
-            cls.registry.IO.Exporter.Field.multi_insert(*fields)
+            cls.anyblok.IO.Exporter.Field.multi_insert(*fields)
 
         return exporter
 

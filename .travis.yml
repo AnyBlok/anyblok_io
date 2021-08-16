@@ -34,10 +34,9 @@ env:
 script:
   - flake8 anyblok_io --exclude=*/tests/*
   - psql -c 'create database travis_ci_test;' -U postgres
-  - pytest --cov-report= --cov=anyblok_io anyblok_io/tests
+  - pytest --cov=anyblok_io anyblok_io/tests
   - psql -c 'drop database travis_ci_test;' -U postgres
   - anyblok_createdb --install-all-bloks
-  - pytest --cov-report= --cov=anyblok_io anyblok_io/bloks
+  - pytest --cov-append --cov=anyblok_io anyblok_io/bloks
   
-after_success:
-  coveralls --data_file=.coverage --config_file=.coveragerc
+after_success: coveralls

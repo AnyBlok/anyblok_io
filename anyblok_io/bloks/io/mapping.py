@@ -12,6 +12,7 @@ from decimal import Decimal
 from .exceptions import IOMappingCheckException, IOMappingSetException
 from logging import getLogger
 from uuid import UUID
+from sqlalchemy import func
 
 
 try:
@@ -77,7 +78,7 @@ class Mapping:
         return (self.model == model) & self.key.in_(keys)
 
     def remove_element(self, byquery=False):
-        val = self.registry.get(self.model).from_primary_keys(
+        val = self.anyblok.get(self.model).from_primary_keys(
             **self.primary_key)
         logger.info("Remove entity for %r.%r: %r" % (
             self.model, self.key, val))
@@ -93,15 +94,22 @@ class Mapping:
         """
         mapping_only = kwargs.get('mapping_only', True)
         byquery = kwargs.get('byquery', False)
-        query = cls.query()
-        query = query.filter(cls.filter_by_model_and_keys(model, *keys))
-        count = query.count()
+
+        filter_ = cls.filter_by_model_and_keys(model, *keys)
+        count = cls.execute_sql_statement(
+            cls.select_sql_statement(func.count()).where(filter_)).scalar()
+
         if count:
             if not mapping_only:
-                query.all().remove_element(byquery=byquery)
+                cls.execute_sql_statement(
+                    cls.select_sql_statement().where(filter_)
+                ).scalar().remove_element(byquery=byquery)
 
-            query.delete(synchronize_session='fetch', remove_mapping=False)
-            cls.registry.expire_all()
+            cls.execute_sql_statement(
+                cls.delete_sql_statement().where(filter_),
+                remove_mapping=False
+            )
+            cls.anyblok.expire_all()
             return count
 
         return 0
@@ -114,14 +122,19 @@ class Mapping:
         :param key: string of the key
         :rtype: Boolean True if the mapping is removed
         """
-        query = cls.query()
-        query = query.filter(cls.filter_by_model_and_key(model, key))
-        count = query.count()
+        filter_ = cls.filter_by_model_and_key(model, key)
+        count = cls.execute_sql_statement(
+            cls.select_sql_statement(func.count()).where(filter_)).scalar()
         if count:
             if not mapping_only:
-                query.one().remove_element(byquery=byquery)
+                cls.execute_sql_statement(
+                    cls.select_sql_statement().where(filter_)
+                ).scalar().remove_element(byquery=byquery)
 
-            query.delete(remove_mapping=False)
+            cls.execute_sql_statement(
+                cls.delete_sql_statement().where(filter_),
+                remove_mapping=False
+            )
             return count
 
         return 0
@@ -273,7 +286,7 @@ class Mapping:
         :params models: list of model
         """
         if models is None:
-            models = cls.registry.System.Model.query().all().name
+            models = cls.anyblok.System.Model.query().all().name
         elif not isinstance(models, (list, tuple)):
             models = [models]
 
@@ -296,7 +309,7 @@ class Mapping:
         :params models: filter by model, keep the order to remove the mapping
         """
         if bloknames is None:
-            bloknames = cls.registry.System.Blok.query().all().name + [None]
+            bloknames = cls.anyblok.System.Blok.query().all().name + [None]
         elif not isinstance(bloknames, (list, tuple)):
             bloknames = [bloknames]
         models = cls.__get_models(models)
@@ -335,7 +348,7 @@ class Mapping:
             for key in query.all().key:
                 if cls.get(model, key):
                     cls.delete(model, key, mapping_only=False, byquery=byquery)
-                    cls.registry.flush()
+                    cls.anyblok.flush()
                     removed += 1
 
         return removed

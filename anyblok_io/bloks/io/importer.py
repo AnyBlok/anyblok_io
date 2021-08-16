@@ -22,7 +22,7 @@ class Importer(Declarations.Mixin.IOMixin):
         return self.get_model(self.mode)(self, blokname=blokname).run()
 
     def get_key_mapping(self, key):
-        Mapping = self.registry.IO.Mapping
+        Mapping = self.anyblok.IO.Mapping
         return Mapping.get(self.model, key)
 
     def commit(self):
@@ -31,7 +31,7 @@ class Importer(Declarations.Mixin.IOMixin):
         elif not self.commit_at_each_grouped:
             return False
 
-        self.registry.commit()
+        self.anyblok.commit()
         return True
 
     def str2value(self, value, ctype, external_id=False, model=None):

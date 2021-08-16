@@ -17,17 +17,17 @@ logger = getLogger(__name__)
 class BlokImporter:
 
     def import_file_csv(self, model, *file_path, **kwargs):
-        if not self.registry.System.Blok.is_installed('anyblok-io-csv'):
+        if not self.anyblok.System.Blok.is_installed('anyblok-io-csv'):
             raise Exception('anyblok-io-csv is not installed in the project')
 
-        Importer = self.registry.IO.Importer.CSV
+        Importer = self.anyblok.IO.Importer.CSV
         return self.import_file(Importer, model, *file_path, **kwargs)
 
     def import_file_xml(self, model, *file_path, **kwargs):
-        if not self.registry.System.Blok.is_installed('anyblok-io-xml'):
+        if not self.anyblok.System.Blok.is_installed('anyblok-io-xml'):
             raise Exception('anyblok-io-xml is not installed in the project')
 
-        Importer = self.registry.IO.Importer.XML
+        Importer = self.anyblok.IO.Importer.XML
         return self.import_file(Importer, model, *file_path, **kwargs)
 
     def import_file(self, Importer, model, *file_path, **kwargs):
