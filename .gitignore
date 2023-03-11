@@ -2,6 +2,8 @@ syntax: glob
 
 dist
 build
+venv
+htmlcov
 doc/_build
 
 .coverage

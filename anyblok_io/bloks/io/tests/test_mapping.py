@@ -6,6 +6,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 import pytest
+from sqlalchemy import text
 from ..exceptions import IOMappingSetException
 from uuid import uuid1
 from datetime import date, datetime
@@ -157,7 +158,7 @@ class TestIOMapping:
     def test_clean_all(self):
         blok = self.Blok.insert(name='Test', version='0.0.0')
         self.Mapping.set('test', blok)
-        self.registry.execute("DELETE FROM system_blok WHERE name='Test'")
+        self.registry.execute(text("DELETE FROM system_blok WHERE name='Test'"))
         assert self.Mapping.query().filter_by(
             key='test', model='Model.System.Blok').count()
         removed = self.Mapping.clean()
@@ -169,7 +170,8 @@ class TestIOMapping:
         self.Blok.insert(name='Test', version='0.0.0')
         blok = self.Blok.insert(name='Test2', version='0.0.0')
         self.Mapping.set('test', blok, blokname='Test')
-        self.registry.execute("DELETE FROM system_blok WHERE name='Test2'")
+        self.registry.execute(
+            text("DELETE FROM system_blok WHERE name='Test2'"))
         assert self.Mapping.query().filter_by(
             key='test', model='Model.System.Blok').count()
         removed = self.Mapping.clean(bloknames=['wrong'])
@@ -185,7 +187,8 @@ class TestIOMapping:
         self.Blok.insert(name='Test', version='0.0.0')
         blok = self.Blok.insert(name='Test2', version='0.0.0')
         self.Mapping.set('test', blok, blokname='Test')
-        self.registry.execute("DELETE FROM system_blok WHERE name='Test2'")
+        self.registry.execute(
+            text("DELETE FROM system_blok WHERE name='Test2'"))
         assert self.Mapping.query().filter_by(
             key='test', model='Model.System.Blok').count()
         self.Mapping.clean(bloknames='Test')
@@ -195,7 +198,7 @@ class TestIOMapping:
     def test_clean_by_models_1(self):
         blok = self.Blok.insert(name='Test', version='0.0.0')
         self.Mapping.set('test', blok)
-        self.registry.execute("DELETE FROM system_blok WHERE name='Test'")
+        self.registry.execute(text("DELETE FROM system_blok WHERE name='Test'"))
         assert self.Mapping.query().filter_by(
             key='test', model='Model.System.Blok').count()
         self.Mapping.clean(models=['Model.System.Column'])
@@ -208,7 +211,7 @@ class TestIOMapping:
     def test_clean_by_models_2(self):
         blok = self.Blok.insert(name='Test', version='0.0.0')
         self.Mapping.set('test', blok)
-        self.registry.execute("DELETE FROM system_blok WHERE name='Test'")
+        self.registry.execute(text("DELETE FROM system_blok WHERE name='Test'"))
         assert self.Mapping.query().filter_by(
             key='test', model='Model.System.Blok').count()
         self.Mapping.clean(models=[self.Column])
@@ -221,7 +224,7 @@ class TestIOMapping:
     def test_clean_by_model(self):
         blok = self.Blok.insert(name='Test', version='0.0.0')
         self.Mapping.set('test', blok)
-        self.registry.execute("DELETE FROM system_blok WHERE name='Test'")
+        self.registry.execute(text("DELETE FROM system_blok WHERE name='Test'"))
         assert self.Mapping.query().filter_by(
             key='test', model='Model.System.Blok').count()
         self.Mapping.clean(models=self.Blok)

@@ -10,7 +10,12 @@
 CHANGELOG
 =========
 
-1.2.0 (2021-8-16)
+2.0.0 (unreleased)
+------------------
+
+* Put on github action
+
+1.2.0 (2021-08-16)
 ------------------
 
 * Adapted to **AnyBlok >= 1.2**
