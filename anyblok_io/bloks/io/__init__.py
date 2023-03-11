@@ -39,8 +39,7 @@ class AnyBlokIO(Blok):
         from . import core  # noqa
 
         cls.declare_io()
-        from . import mixin  # noqa
-
+        from . import mixin  # noqa isort:skip
         from . import exporter  # noqa
         from . import formater  # noqa
         from . import importer  # noqa

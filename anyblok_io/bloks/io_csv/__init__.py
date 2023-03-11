@@ -21,8 +21,7 @@ class AnyBlokIOCSV(Blok):
 
     @classmethod
     def import_declaration_module(cls):
-        from . import mixin  # noqa
-
+        from . import mixin  # noqa isort:skip
         from . import exporter  # noqa
         from . import importer  # noqa
 
