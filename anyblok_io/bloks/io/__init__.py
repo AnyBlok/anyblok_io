@@ -39,11 +39,12 @@ class AnyBlokIO(Blok):
         from . import core  # noqa
 
         cls.declare_io()
+        from . import mixin  # noqa
+
         from . import exporter  # noqa
         from . import formater  # noqa
         from . import importer  # noqa
         from . import mapping  # noqa
-        from . import mixin  # noqa
 
     @classmethod
     def reload_declaration_module(cls, reload):
