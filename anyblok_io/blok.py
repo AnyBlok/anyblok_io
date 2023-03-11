@@ -14,17 +14,23 @@ from anyblok.blok import BlokManager
 logger = getLogger(__name__)
 
 
+class BlokImporterException(Exception):
+    pass
+
+
 class BlokImporter:
     def import_file_csv(self, model, *file_path, **kwargs):
         if not self.anyblok.System.Blok.is_installed("anyblok-io-csv"):
-            raise Exception("anyblok-io-csv is not installed in the project")
+            raise BlokImporterException(
+                "anyblok-io-csv is not installed in the project")
 
         Importer = self.anyblok.IO.Importer.CSV
         return self.import_file(Importer, model, *file_path, **kwargs)
 
     def import_file_xml(self, model, *file_path, **kwargs):
         if not self.anyblok.System.Blok.is_installed("anyblok-io-xml"):
-            raise Exception("anyblok-io-xml is not installed in the project")
+            raise BlokImporterException(
+                "anyblok-io-xml is not installed in the project")
 
         Importer = self.anyblok.IO.Importer.XML
         return self.import_file(Importer, model, *file_path, **kwargs)
@@ -61,7 +67,7 @@ class BlokImporter:
             dt.microseconds,
         )
         if "error_found" in res and res["error_found"]:
-            for error in res["error_found"]:
+            for error in res["error_found"]:  # pragma: no cover
                 logger.error(error)
         else:
             importer.delete()

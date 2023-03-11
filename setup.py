@@ -66,6 +66,8 @@ setup(
         "test_bloks": [
             "test-io-blok1=anyblok_io.test_bloks.test_blok1:TestBlok",
             "test-io-blok2=anyblok_io.test_bloks.test_blok2:TestBlok",
+            "test-io-blok3=anyblok_io.test_bloks.test_blok3:TestBlok",
+            "test-io-blok4=anyblok_io.test_bloks.test_blok4:TestBlok",
         ],
     },
     extras_require={},
