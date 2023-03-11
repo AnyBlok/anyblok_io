@@ -11,35 +11,6 @@ from sqlalchemy import select
 
 
 @Declarations.register(Declarations.Core)
-class Query:
-    def delete(self, *args, **kwargs):
-        """Inherit the Query.delete methods.::
-        Model.query().delete(remove_mapping=True)
-
-        :param remove_mapping: boolean, if check (default) the mapping is
-        removed
-        """
-        remove_mapping = kwargs.pop("remove_mapping", True)
-        if remove_mapping:
-            Mapping = self.anyblok.IO.Mapping
-            mappings = []
-            for entry in self.all():
-                mapping = Mapping.get_from_model_and_primary_keys(
-                    entry.__registry_name__, entry.to_primary_keys()
-                )
-                if mapping and mapping not in mappings:
-                    mappings.append(mapping)
-
-            res = super(Query, self).delete(*args, **kwargs)
-            for mapping in mappings:
-                Mapping.delete(mapping.model, mapping.key)
-
-            return res
-
-        return super(Query, self).delete(*args, **kwargs)
-
-
-@Declarations.register(Declarations.Core)
 class SqlBase:
     @classmethod
     def execute_sql_statement(cls, statement, *args, **kwargs):
