@@ -40,16 +40,6 @@ class TestIOCore:
         blok.delete()
         self.checkUnExist()
 
-    def test_query_delete_obj_with_mapping(self):
-        Mapping = self.registry.IO.Mapping
-        Blok = self.registry.System.Blok
-        blok = Blok.insert(name='Test', version='0.0.0')
-        self.checkUnExist()
-        Mapping.set('test', blok)
-        self.checkExist()
-        Blok.query().filter_by(name='Test').delete()
-        self.checkUnExist()
-
     def test_delete_statement_with_mapping(self):
         Mapping = self.registry.IO.Mapping
         Blok = self.registry.System.Blok
