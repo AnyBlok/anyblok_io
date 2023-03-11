@@ -20,6 +20,12 @@ class TestImportCSV:
     def transact(self, rollback_registry):
         self.registry = rollback_registry
 
+    def test_create_without_model(self):
+        CSV = self.registry.IO.Importer.CSV
+        file_to_import = urandom(100000)
+        with pytest.raises(CSVImporterException):
+            CSV.insert(file_to_import=file_to_import)
+
     def create_importer(self, file_to_import=None, **kwargs):
         CSV = self.registry.IO.Importer.CSV
         if "model" not in kwargs:

@@ -10,6 +10,7 @@ from io import StringIO
 
 from anyblok import Declarations
 from anyblok.column import Selection
+from anyblok.mapper import ModelAdapter
 
 from .exceptions import CSVImporterException
 
@@ -233,13 +234,12 @@ class CSV:
         if "model" not in kwargs:
             raise CSVImporterException("The column 'model' is required")
 
-        if not isinstance(kwargs["model"], str):
-            kwargs["model"] = kwargs["model"].__registry_name__
+        kwargs["model"] = ModelAdapter(kwargs["model"]).model_name
 
         if delimiter is not None:
-            kwargs["csv_delimiter"] = delimiter
+            kwargs["csv_delimiter"] = delimiter  # pragma: no cover
 
         if quotechar is not None:
-            kwargs["csv_quotechar"] = quotechar
+            kwargs["csv_quotechar"] = quotechar  # pragma: no cover
 
         return cls.anyblok.IO.Importer.insert(**kwargs)
