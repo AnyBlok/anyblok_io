@@ -10,6 +10,7 @@ from io import StringIO
 
 from anyblok import Declarations
 from anyblok.column import Selection, String
+from anyblok.mapper import ModelAdapter
 from anyblok.relationship import Many2One
 
 from .exceptions import CSVExporterException
@@ -72,11 +73,13 @@ class Field(Mixin.IOCSVFieldMixin):
         elif fields_description["model"]:
             model = fields_description["model"]
             Model = self.anyblok.get(model)
-            pks = Model.get_primary_keys()
-            if len(pks) == 1:
-                pks = {pks[0]: getattr(entry, name)}
-            else:
-                raise CSVExporterException("Not implemented yet")
+            mapper = ModelAdapter(entry)
+            pks = {
+                col.get_fk_column(self.anyblok): (
+                    getattr(entry, col.attribute_name)
+                )
+                for col in mapper.foreign_keys_for(self.anyblok, model)
+            }
 
             return Model.from_primary_keys(**pks)
 
@@ -89,7 +92,7 @@ class Field(Mixin.IOCSVFieldMixin):
     def value2str(self, exporter, entry):
         def _rc_get_value(names, entry):
             if not names:
-                return ""
+                return ""  # pragma: no cover
             elif len(names) == 1:
                 external_id = False if self.mode == "any" else True
                 return self._value2str(exporter, names[0], entry, external_id)
@@ -120,10 +123,10 @@ class CSV:
                 kwargs["model"] = kwargs["model"].__registry_name__
 
         if delimiter is not None:
-            kwargs["csv_delimiter"] = delimiter
+            kwargs["csv_delimiter"] = delimiter  # pragma: no cover
 
         if quotechar is not None:
-            kwargs["csv_quotechar"] = quotechar
+            kwargs["csv_quotechar"] = quotechar  # pragma: no cover
 
         exporter = cls.anyblok.IO.Exporter.insert(**kwargs)
         if fields:
