@@ -10,7 +10,7 @@ from io import StringIO
 
 from anyblok import Declarations
 from anyblok.column import Selection
-from anyblok.mapper import ModelAdapter
+from anyblok.mapper import ModelAdapter, ModelAttribute
 
 from .exceptions import CSVImporterException
 
@@ -176,8 +176,11 @@ class CSV:
             for external_field, field in self.header_external_ids.items():
                 ctype = self.fields_description[field]["type"]
                 model = self.fields_description[field]["model"]
+                mapper = ModelAttribute(self.importer.model, field)
+                fieldname = mapper.get_fk_remote(self.anyblok)
                 values[field] = self.importer.str2value(
-                    row[external_field], ctype, external_id=True, model=model
+                    row[external_field], ctype, external_id=True, model=model,
+                    fieldname=fieldname,
                 )
 
             if self.header_external_id:

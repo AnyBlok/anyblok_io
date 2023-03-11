@@ -33,9 +33,11 @@ class Importer(Declarations.Mixin.IOMixin):
         self.anyblok.commit()
         return True
 
-    def str2value(self, value, ctype, external_id=False, model=None):
+    def str2value(
+        self, value, ctype, external_id=False, model=None, fieldname=None
+    ):
         formater = self.get_formater(ctype)
         if external_id:
-            return formater.externalIdStr2value(value, model)
+            return formater.externalIdStr2value(value, model, fieldname)
 
         return formater.str2value(value, model)

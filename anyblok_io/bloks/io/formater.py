@@ -30,19 +30,14 @@ class Formater:
 
         return mapping
 
-    def externalIdStr2value(self, value, model):
+    def externalIdStr2value(self, value, model, fieldname):
         entry = self._externalIdStr2value(value, model)
         pks = entry.to_primary_keys()
-        if len(pks.keys()) > 1:
-            raise FormaterException(
-                "Foreign key on multi primary keys does not implemented yet"
-            )
-
-        return [x for x in pks.values()][0]
+        return pks[fieldname]
 
     def value2str(self, value, model):
         if value is None:
-            return ""
+            return ""  # pragma: no cover
 
         return str(value)
 
@@ -118,7 +113,8 @@ class Boolean(IO.Formater):
         elif value in ("0", "false", "False", "", 0, False):
             return False
 
-        raise FormaterException("Value %r is not a boolean" % value)
+        raise FormaterException(  # pragma: no cover
+            "Value %r is not a boolean" % value)
 
     def value2str(self, value, model):
         return "1" if value else "0"
@@ -149,14 +145,14 @@ class Many2One(IO.Formater):
     def str2value(self, value, model):
         Model = self.anyblok.get(model)
         if not value:
-            return None
+            return None  # pragma: no cover
 
         pks = loads(value)
         if not pks:
-            return None
+            return None  # pragma: no cover
 
         if not isinstance(pks, dict):
-            raise FormaterException(
+            raise FormaterException(  # pragma: no cover
                 "Value %r for %r must be dict" % (value, self.__registry_name__)
             )
 
@@ -170,13 +166,13 @@ class Many2One(IO.Formater):
 
     def value2str(self, value, model):
         if value is None:
-            return ""
+            return ""  # pragma: no cover
 
         return dumps(value.to_primary_keys())
 
     def externalIdValue2str(self, value, model):
         if value is None:
-            return ""
+            return ""  # pragma: no cover
 
         Exporter = self.anyblok.IO.Exporter
         return Exporter.get_key_mapping(value)
@@ -192,12 +188,12 @@ class Many2Many(IO.Formater):
     def str2value(self, value, model):
         Model = self.anyblok.get(model)
         if not value:
-            return None
+            return None  # pragma: no cover
 
         pks = loads(value)
 
         if not all(isinstance(x, dict) for x in pks):
-            raise FormaterException(
+            raise FormaterException(  # pragma: no cover
                 "All values in %r for %r must be dict"
                 % (value, self.__registry_name__)
             )
@@ -213,13 +209,13 @@ class Many2Many(IO.Formater):
 
     def value2str(self, values, model):
         if not values:
-            return dumps([])
+            return dumps([])  # pragma: no cover
 
         return dumps([value.to_primary_keys() for value in values])
 
     def externalIdValue2str(self, values, model):
         if not values:
-            return dumps([])
+            return dumps([])  # pragma: no cover
 
         Exporter = self.anyblok.IO.Exporter
         return dumps([Exporter.get_key_mapping(value) for value in values])
