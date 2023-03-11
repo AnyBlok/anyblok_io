@@ -8,21 +8,20 @@
 import pytest
 
 
-@pytest.mark.usefixtures('rollback_registry')
+@pytest.mark.usefixtures("rollback_registry")
 class TestImporter:
-
     @pytest.fixture(autouse=True)
     def transact(self, rollback_registry):
         self.registry = rollback_registry
 
     def create_importer(self, **kwargs):
         Importer = self.registry.IO.Importer
-        kwargs['model'] = 'Model.IO.Importer'
-        if 'check_import' not in kwargs:
-            kwargs['check_import'] = False
+        kwargs["model"] = "Model.IO.Importer"
+        if "check_import" not in kwargs:
+            kwargs["check_import"] = False
 
-        if 'commit_at_each_grouped' not in kwargs:
-            kwargs['commit_at_each_grouped'] = True
+        if "commit_at_each_grouped" not in kwargs:
+            kwargs["commit_at_each_grouped"] = True
 
         return Importer(**kwargs)
 

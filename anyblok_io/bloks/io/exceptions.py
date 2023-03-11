@@ -8,15 +8,15 @@
 
 
 class IOException(Exception):
-    """ IO exception """
+    """IO exception"""
 
 
 class IOMappingCheckException(IOException):
-    """ IO Exception for setter """
+    """IO Exception for setter"""
 
 
 class IOMappingSetException(IOException):
-    """ IO Exception for setter """
+    """IO Exception for setter"""
 
 
 class ImporterException(Exception):

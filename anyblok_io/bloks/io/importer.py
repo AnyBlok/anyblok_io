@@ -6,12 +6,11 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok import Declarations
-from anyblok.column import LargeBinary, Boolean, Integer
+from anyblok.column import Boolean, Integer, LargeBinary
 
 
 @Declarations.register(Declarations.Model.IO)
 class Importer(Declarations.Mixin.IOMixin):
-
     file_to_import = LargeBinary(nullable=False)
     offset = Integer(default=0)
     nb_grouped_lines = Integer(nullable=False, default=50)

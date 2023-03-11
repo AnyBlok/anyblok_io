@@ -6,8 +6,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok import Declarations
-from anyblok.column import String, Integer
-
+from anyblok.column import Integer, String
 
 register = Declarations.register
 Mixin = Declarations.Mixin
@@ -15,13 +14,11 @@ Mixin = Declarations.Mixin
 
 @register(Mixin)
 class IOCSVFieldMixin:
-
     id = Integer(primary_key=True)
     name = String(nullable=False)
 
 
 @register(Mixin)
 class IOCSVMixin:
-
     csv_delimiter = String(nullable=False, default=",")
     csv_quotechar = String(nullable=False, default='"')

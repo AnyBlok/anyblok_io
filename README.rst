@@ -17,7 +17,7 @@
 .. image:: https://img.shields.io/pypi/v/anyblok_io.svg
    :target: https://pypi.python.org/pypi/anyblok_io/
    :alt: Version status
-   
+
 .. image:: https://readthedocs.org/projects/anyblok_io/badge/?version=latest
     :alt: Documentation Status
     :scale: 100%

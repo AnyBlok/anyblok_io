@@ -19,13 +19,14 @@ class Query:
         :param remove_mapping: boolean, if check (default) the mapping is
         removed
         """
-        remove_mapping = kwargs.pop('remove_mapping', True)
+        remove_mapping = kwargs.pop("remove_mapping", True)
         if remove_mapping:
             Mapping = self.anyblok.IO.Mapping
             mappings = []
             for entry in self.all():
                 mapping = Mapping.get_from_model_and_primary_keys(
-                    entry.__registry_name__, entry.to_primary_keys())
+                    entry.__registry_name__, entry.to_primary_keys()
+                )
                 if mapping and mapping not in mappings:
                     mappings.append(mapping)
 
@@ -40,26 +41,28 @@ class Query:
 
 @Declarations.register(Declarations.Core)
 class SqlBase:
-
     @classmethod
     def execute_sql_statement(cls, statement, *args, **kwargs):
-        remove_mapping = kwargs.pop('remove_mapping', True)
+        remove_mapping = kwargs.pop("remove_mapping", True)
         if remove_mapping:
-            if str(statement).startswith('DELETE FROM '):
+            if str(statement).startswith("DELETE FROM "):
                 Mapping = cls.anyblok.IO.Mapping
                 mappings = []
                 stmt = select(statement.table).where(*statement._where_criteria)
                 entries = cls.execute_sql_statement(
-                    stmt, remove_mapping=False).scalars()
+                    stmt, remove_mapping=False
+                ).scalars()
 
                 for entry in entries:
                     mapping = Mapping.get_from_model_and_primary_keys(
-                        entry.__registry_name__, entry.to_primary_keys())
+                        entry.__registry_name__, entry.to_primary_keys()
+                    )
                     if mapping and mapping not in mappings:
                         mappings.append(mapping)
 
                 res = super(SqlBase, cls).execute_sql_statement(
-                    statement, *args, **kwargs)
+                    statement, *args, **kwargs
+                )
 
                 for mapping in mappings:
                     Mapping.delete(mapping.model, mapping.key)
@@ -67,7 +70,8 @@ class SqlBase:
                 return res
 
         return super(SqlBase, cls).execute_sql_statement(
-            statement, *args, **kwargs)
+            statement, *args, **kwargs
+        )
 
     def delete(self, *args, **kwargs):
         """Inherit the Model.delete methods.::
@@ -77,11 +81,12 @@ class SqlBase:
         :param remove_mapping: boolean, if check (default) the mapping is
             removed
         """
-        remove_mapping = kwargs.pop('remove_mapping', True)
+        remove_mapping = kwargs.pop("remove_mapping", True)
         if remove_mapping:
             Mapping = self.anyblok.IO.Mapping
             mapping = Mapping.get_from_model_and_primary_keys(
-                self.__registry_name__, self.to_primary_keys())
+                self.__registry_name__, self.to_primary_keys()
+            )
 
             res = super(SqlBase, self).delete(*args, **kwargs)
             if mapping:

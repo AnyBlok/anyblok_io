@@ -10,28 +10,31 @@ from anyblok.release import version
 
 
 class AnyBlokIOXML(Blok):
-    """ XML Importer / Exporter behaviour
+    """XML Importer / Exporter behaviour
 
     .. warning::
 
         Importer and Exporter are not implemented yet
 
     """
+
     version = version
-    author = 'Suzanne Jean-Sébastien'
+    author = "Suzanne Jean-Sébastien"
 
     required = [
-        'anyblok-io',
+        "anyblok-io",
     ]
 
     @classmethod
     def import_declaration_module(cls):
-        from . import importer  # noqa
         from . import exporter  # noqa
+        from . import importer  # noqa
 
     @classmethod
     def reload_declaration_module(cls, reload):
         from . import importer
+
         reload(importer)
         from . import exporter
+
         reload(exporter)

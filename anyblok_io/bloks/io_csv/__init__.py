@@ -10,26 +10,29 @@ from anyblok.release import version
 
 
 class AnyBlokIOCSV(Blok):
-    """ CSV Importer / Exporter behaviour
-    """
+    """CSV Importer / Exporter behaviour"""
+
     version = version
-    author = 'Suzanne Jean-Sébastien'
+    author = "Suzanne Jean-Sébastien"
 
     required = [
-        'anyblok-io',
+        "anyblok-io",
     ]
 
     @classmethod
     def import_declaration_module(cls):
-        from . import mixin  # noqa
-        from . import importer  # noqa
         from . import exporter  # noqa
+        from . import importer  # noqa
+        from . import mixin  # noqa
 
     @classmethod
     def reload_declaration_module(cls, reload):
         from . import mixin
+
         reload(mixin)
         from . import importer
+
         reload(importer)
         from . import exporter
+
         reload(exporter)

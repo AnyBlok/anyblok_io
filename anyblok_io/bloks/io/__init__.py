@@ -17,12 +17,13 @@ class AnyBlokIO(Blok):
     * Importer: main model to define an import,
     * Exporter: main model to define an export,
     """
+
     version = version
-    author = 'Suzanne Jean-Sébastien'
-    logo = '../anyblok-logo_alpha_256.png'
+    author = "Suzanne Jean-Sébastien"
+    logo = "../anyblok-logo_alpha_256.png"
 
     required = [
-        'anyblok-core',
+        "anyblok-core",
     ]
 
     @classmethod
@@ -36,25 +37,32 @@ class AnyBlokIO(Blok):
     @classmethod
     def import_declaration_module(cls):
         from . import core  # noqa
+
         cls.declare_io()
-        from . import mapping  # noqa
-        from . import mixin  # noqa
-        from . import importer  # noqa
         from . import exporter  # noqa
         from . import formater  # noqa
+        from . import importer  # noqa
+        from . import mapping  # noqa
+        from . import mixin  # noqa
 
     @classmethod
     def reload_declaration_module(cls, reload):
         from . import core
+
         reload(core)
         cls.declare_io()
         from . import mapping
+
         reload(mapping)
         from . import mixin
+
         reload(mixin)
         from . import importer
+
         reload(importer)
         from . import exporter
+
         reload(exporter)
         from . import formater
+
         reload(formater)

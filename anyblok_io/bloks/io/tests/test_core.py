@@ -9,9 +9,8 @@ import pytest
 from sqlalchemy import func
 
 
-@pytest.mark.usefixtures('rollback_registry')
+@pytest.mark.usefixtures("rollback_registry")
 class TestIOCore:
-
     @pytest.fixture(autouse=True)
     def transact(self, rollback_registry):
         self.registry = rollback_registry
@@ -20,22 +19,24 @@ class TestIOCore:
         Mapping = self.registry.IO.Mapping
         assert Mapping.execute_sql_statement(
             Mapping.select_sql_statement(func.count()).where(
-                Mapping.key == 'test', Mapping.model == 'Model.System.Blok')
+                Mapping.key == "test", Mapping.model == "Model.System.Blok"
+            )
         ).scalar()
 
     def checkUnExist(self):
         Mapping = self.registry.IO.Mapping
         assert not Mapping.execute_sql_statement(
             Mapping.select_sql_statement(func.count()).where(
-                Mapping.key == 'test', Mapping.model == 'Model.System.Blok')
+                Mapping.key == "test", Mapping.model == "Model.System.Blok"
+            )
         ).scalar()
 
     def test_session_delete_obj_with_mapping(self):
         Mapping = self.registry.IO.Mapping
         Blok = self.registry.System.Blok
-        blok = Blok.insert(name='Test', version='0.0.0')
+        blok = Blok.insert(name="Test", version="0.0.0")
         self.checkUnExist()
-        Mapping.set('test', blok)
+        Mapping.set("test", blok)
         self.checkExist()
         blok.delete()
         self.checkUnExist()
@@ -43,11 +44,11 @@ class TestIOCore:
     def test_delete_statement_with_mapping(self):
         Mapping = self.registry.IO.Mapping
         Blok = self.registry.System.Blok
-        blok = Blok.insert(name='Test', version='0.0.0')
+        blok = Blok.insert(name="Test", version="0.0.0")
         self.checkUnExist()
-        Mapping.set('test', blok)
+        Mapping.set("test", blok)
         self.checkExist()
         Blok.execute_sql_statement(
-            Blok.delete_sql_statement().filter_by(name='Test')
+            Blok.delete_sql_statement().filter_by(name="Test")
         )
         self.checkUnExist()
