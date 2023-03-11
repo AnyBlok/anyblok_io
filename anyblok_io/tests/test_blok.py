@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is a part of the AnyBlok project
 #
 #    Copyright (C) 2014 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
@@ -10,7 +9,6 @@ import pytest  # noqa
 
 
 class TestBlok:
-
     def test_import_file(self, registry_testblok):
-        registry_testblok.upgrade(install=('test-io-blok1', 'test-io-blok2'))
+        registry_testblok.upgrade(install=("test-io-blok1", "test-io-blok2"))
         assert registry_testblok.Exemple.query().count() == 6

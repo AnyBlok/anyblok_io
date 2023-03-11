@@ -5,11 +5,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok import Declarations
 import datetime
-from json import loads, dumps
-from .exceptions import FormaterException
+from json import dumps, loads
 
+from anyblok import Declarations
+
+from .exceptions import FormaterException
 
 register = Declarations.register
 IO = Declarations.Model.IO
@@ -17,7 +18,6 @@ IO = Declarations.Model.IO
 
 @register(IO)
 class Formater:
-
     def str2value(self, value, model):
         return value
 
@@ -25,7 +25,8 @@ class Formater:
         mapping = self.anyblok.IO.Mapping.get(model, value)
         if mapping is None:
             raise FormaterException(
-                "Unexisting mapping key %r with model %r" % (value, model))
+                "Unexisting mapping key %r with model %r" % (value, model)
+            )
 
         return mapping
 
@@ -34,13 +35,14 @@ class Formater:
         pks = entry.to_primary_keys()
         if len(pks.keys()) > 1:
             raise FormaterException(
-                "Foreign key on multi primary keys does not implemented yet")
+                "Foreign key on multi primary keys does not implemented yet"
+            )
 
         return [x for x in pks.values()][0]
 
     def value2str(self, value, model):
         if value is None:
-            return ''
+            return ""
 
         return str(value)
 
@@ -50,7 +52,8 @@ class Formater:
         pks = Model.get_primary_keys()
         if len(pks) > 1:
             raise FormaterException(
-                "Foreign key on multi primary keys does not implemented yet")
+                "Foreign key on multi primary keys does not implemented yet"
+            )
 
         pks = {x: value for x in pks}
         mapping = Mapping.get_from_model_and_primary_keys(model, pks)
@@ -66,22 +69,20 @@ class Formater:
 
 @register(IO.Formater)
 class Float(IO.Formater):
-
     def str2value(self, value, model):
         return float(value)
 
 
 @register(IO.Formater)
 class Decimal(IO.Formater):
-
     def str2value(self, value, model):
         from decimal import Decimal as D
+
         return D(value)
 
 
 @register(IO.Formater)
 class Json(IO.Formater):
-
     def str2value(self, value, model):
         return loads(value)
 
@@ -91,7 +92,6 @@ class Json(IO.Formater):
 
 @register(IO.Formater)
 class Interval(IO.Formater):
-
     def str2value(self, value, model):
         return datetime.timedelta(seconds=int(value))
 
@@ -101,7 +101,6 @@ class Interval(IO.Formater):
 
 @register(IO.Formater)
 class Integer(IO.Formater):
-
     def str2value(self, value, model):
         return int(value)
 
@@ -113,23 +112,20 @@ class BigInteger(IO.Formater.Integer):
 
 @register(IO.Formater)
 class Boolean(IO.Formater):
-
     def str2value(self, value, model):
         if value in ("1", "true", "True", 1, True):
             return True
-        elif value in ("0", "false", "False", '', 0, False):
+        elif value in ("0", "false", "False", "", 0, False):
             return False
 
-        raise FormaterException(
-            "Value %r is not a boolean" % value)
+        raise FormaterException("Value %r is not a boolean" % value)
 
     def value2str(self, value, model):
-        return '1' if value else '0'
+        return "1" if value else "0"
 
 
 @register(IO.Formater)
 class Time(IO.Formater):
-
     def str2value(self, value, model):
         dt = datetime.datetime.strptime(value, "%H:%M:%S")
         return datetime.time(dt.hour, dt.minute, dt.second)
@@ -137,7 +133,6 @@ class Time(IO.Formater):
 
 @register(IO.Formater)
 class Date(IO.Formater):
-
     def str2value(self, value, model):
         dt = datetime.datetime.strptime(value, "%Y-%m-%d")
         return datetime.date(dt.year, dt.month, dt.day)
@@ -145,14 +140,12 @@ class Date(IO.Formater):
 
 @register(IO.Formater)
 class DateTime(IO.Formater):
-
     def str2value(self, value, model):
         return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 
 
 @register(IO.Formater)
 class Many2One(IO.Formater):
-
     def str2value(self, value, model):
         Model = self.anyblok.get(model)
         if not value:
@@ -164,8 +157,8 @@ class Many2One(IO.Formater):
 
         if not isinstance(pks, dict):
             raise FormaterException(
-                "Value %r for %r must be dict" % (
-                    value, self.__registry_name__))
+                "Value %r for %r must be dict" % (value, self.__registry_name__)
+            )
 
         return Model.from_primary_keys(**pks)
 
@@ -177,13 +170,13 @@ class Many2One(IO.Formater):
 
     def value2str(self, value, model):
         if value is None:
-            return ''
+            return ""
 
         return dumps(value.to_primary_keys())
 
     def externalIdValue2str(self, value, model):
         if value is None:
-            return ''
+            return ""
 
         Exporter = self.anyblok.IO.Exporter
         return Exporter.get_key_mapping(value)
@@ -196,7 +189,6 @@ class One2One(IO.Formater.Many2One):
 
 @register(IO.Formater)
 class Many2Many(IO.Formater):
-
     def str2value(self, value, model):
         Model = self.anyblok.get(model)
         if not value:
@@ -206,13 +198,14 @@ class Many2Many(IO.Formater):
 
         if not all(isinstance(x, dict) for x in pks):
             raise FormaterException(
-                "All values in %r for %r must be dict" % (
-                    value, self.__registry_name__))
+                "All values in %r for %r must be dict"
+                % (value, self.__registry_name__)
+            )
 
         return [Model.from_primary_keys(**x) for x in pks if x]
 
     def externalIdStr2value(self, values, model):
-        if not values or values == 'null':
+        if not values or values == "null":
             return []
 
         values = loads(values)

@@ -5,18 +5,20 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.declarations import Declarations, hybrid_method
-from anyblok.column import String, Json
-from datetime import datetime, date
+from datetime import date, datetime
 from decimal import Decimal
-from .exceptions import IOMappingCheckException, IOMappingSetException
 from logging import getLogger
 from uuid import UUID
+
+from anyblok.column import Json, String
+from anyblok.declarations import Declarations, hybrid_method
 from sqlalchemy import func
 
+from .exceptions import IOMappingCheckException, IOMappingSetException
 
 try:
     import colour
+
     has_colour = True
 except Exception:
     has_colour = False
@@ -24,6 +26,7 @@ except Exception:
 
 try:
     import furl  # noqa
+
     has_furl = True
 except Exception:
     has_furl = False
@@ -31,6 +34,7 @@ except Exception:
 
 try:
     import phonenumbers  # noqa
+
     has_phonenumbers = True
     from sqlalchemy_utils import PhoneNumber as PN
 except Exception:
@@ -39,6 +43,7 @@ except Exception:
 
 try:
     import pycountry  # noqa
+
     has_pycountry = True
 except Exception:
     has_pycountry = False
@@ -51,17 +56,18 @@ Model = Declarations.Model
 
 @register(Model.IO)
 class Mapping:
-
     key = String(primary_key=True)
-    model = String(primary_key=True, size=256,
-                   foreign_key=Model.System.Model.use('name'))
+    model = String(
+        primary_key=True, size=256, foreign_key=Model.System.Model.use("name")
+    )
     primary_key = Json(nullable=False)
-    blokname = String(label="Blok name",
-                      foreign_key=Model.System.Blok.use('name'))
+    blokname = String(
+        label="Blok name", foreign_key=Model.System.Blok.use("name")
+    )
 
     @hybrid_method
     def filter_by_model_and_key(self, model, key):
-        """ SQLAlechemy hybrid method to filter by model and key
+        """SQLAlechemy hybrid method to filter by model and key
 
         :param model: model of the mapping
         :param key: external key of the mapping
@@ -70,7 +76,7 @@ class Mapping:
 
     @hybrid_method
     def filter_by_model_and_keys(self, model, *keys):
-        """ SQLAlechemy hybrid method to filter by model and key
+        """SQLAlechemy hybrid method to filter by model and key
 
         :param model: model of the mapping
         :param key: external key of the mapping
@@ -78,26 +84,25 @@ class Mapping:
         return (self.model == model) & self.key.in_(keys)
 
     def remove_element(self, byquery=False):
-        val = self.anyblok.get(self.model).from_primary_keys(
-            **self.primary_key)
-        logger.info("Remove entity for %r.%r: %r" % (
-            self.model, self.key, val))
+        val = self.anyblok.get(self.model).from_primary_keys(**self.primary_key)
+        logger.info("Remove entity for %r.%r: %r" % (self.model, self.key, val))
         val.delete(byquery=byquery, remove_mapping=False)
 
     @classmethod
     def multi_delete(cls, model, *keys, **kwargs):
-        """ Delete all the keys for this model
+        """Delete all the keys for this model
 
         :param model: model of the mapping
         :param keys: list of the key
         :rtype: Boolean True if the mappings are removed
         """
-        mapping_only = kwargs.get('mapping_only', True)
-        byquery = kwargs.get('byquery', False)
+        mapping_only = kwargs.get("mapping_only", True)
+        byquery = kwargs.get("byquery", False)
 
         filter_ = cls.filter_by_model_and_keys(model, *keys)
         count = cls.execute_sql_statement(
-            cls.select_sql_statement(func.count()).where(filter_)).scalar()
+            cls.select_sql_statement(func.count()).where(filter_)
+        ).scalar()
 
         if count:
             if not mapping_only:
@@ -106,8 +111,7 @@ class Mapping:
                 ).scalar().remove_element(byquery=byquery)
 
             cls.execute_sql_statement(
-                cls.delete_sql_statement().where(filter_),
-                remove_mapping=False
+                cls.delete_sql_statement().where(filter_), remove_mapping=False
             )
             cls.anyblok.expire_all()
             return count
@@ -116,7 +120,7 @@ class Mapping:
 
     @classmethod
     def delete(cls, model, key, mapping_only=True, byquery=False):
-        """ Delete the key for this model
+        """Delete the key for this model
 
         :param model: model of the mapping
         :param key: string of the key
@@ -124,7 +128,8 @@ class Mapping:
         """
         filter_ = cls.filter_by_model_and_key(model, key)
         count = cls.execute_sql_statement(
-            cls.select_sql_statement(func.count()).where(filter_)).scalar()
+            cls.select_sql_statement(func.count()).where(filter_)
+        ).scalar()
         if count:
             if not mapping_only:
                 cls.execute_sql_statement(
@@ -132,8 +137,7 @@ class Mapping:
                 ).scalar().remove_element(byquery=byquery)
 
             cls.execute_sql_statement(
-                cls.delete_sql_statement().where(filter_),
-                remove_mapping=False
+                cls.delete_sql_statement().where(filter_), remove_mapping=False
             )
             return count
 
@@ -141,7 +145,7 @@ class Mapping:
 
     @classmethod
     def get_mapping_primary_keys(cls, model, key):
-        """ return primary key for a model and an external key
+        """return primary key for a model and an external key
 
         :param model: model of the mapping
         :param key: string of the key
@@ -158,7 +162,7 @@ class Mapping:
 
     @classmethod
     def check_primary_keys(cls, model, *pks):
-        """ check if the all the primary keys match with primary keys of the
+        """check if the all the primary keys match with primary keys of the
         model
 
         :param model: model to check
@@ -168,8 +172,9 @@ class Mapping:
         for pk in cls.get_model(model).get_primary_keys():
             if pk not in pks:
                 raise IOMappingCheckException(
-                    "No primary key %r found in %r for model %r" % (
-                        pk, pks, model))
+                    "No primary key %r found in %r for model %r"
+                    % (pk, pks, model)
+                )
 
     @classmethod
     def convert_primary_key(cls, value):
@@ -188,7 +193,7 @@ class Mapping:
         if has_furl and isinstance(value, furl.furl):
             return str(value)
 
-        if has_pycountry and value.__class__.__name__ == 'Country':
+        if has_pycountry and value.__class__.__name__ == "Country":
             return value.alpha_3
 
         if has_phonenumbers and isinstance(value, PN):
@@ -197,9 +202,10 @@ class Mapping:
         return value
 
     @classmethod
-    def set_primary_keys(cls, model, key, pks, raiseifexist=True,
-                         blokname=None):
-        """ Add or update a mmping with a model and a external key
+    def set_primary_keys(
+        cls, model, key, pks, raiseifexist=True, blokname=None
+    ):
+        """Add or update a mmping with a model and a external key
 
         :param model: model to check
         :param key: string of the key
@@ -212,13 +218,15 @@ class Mapping:
         if cls.get_mapping_primary_keys(model, key):
             if raiseifexist:
                 raise IOMappingSetException(
-                    "One value found for model %r and key %r" % (model, key))
+                    "One value found for model %r and key %r" % (model, key)
+                )
             cls.delete(model, key)
 
         if not pks:
             raise IOMappingSetException(
-                "No value to save %r for model %r and key %r" % (
-                    pks, model, key))
+                "No value to save %r for model %r and key %r"
+                % (pks, model, key)
+            )
 
         cls.check_primary_keys(model, *pks.keys())
 
@@ -227,13 +235,13 @@ class Mapping:
 
         vals = dict(model=model, key=key, primary_key=pks)
         if blokname is not None:
-            vals['blokname'] = blokname
+            vals["blokname"] = blokname
 
         return cls.insert(**vals)
 
     @classmethod
     def set(cls, key, instance, raiseifexist=True, blokname=None):
-        """ Add or update a mmping with a model and a external key
+        """Add or update a mmping with a model and a external key
 
         :param model: model to check
         :param key: string of the key
@@ -244,13 +252,17 @@ class Mapping:
         :exception: IOMappingSetException
         """
         pks = instance.to_primary_keys()
-        return cls.set_primary_keys(instance.__registry_name__, key, pks,
-                                    blokname=blokname,
-                                    raiseifexist=raiseifexist)
+        return cls.set_primary_keys(
+            instance.__registry_name__,
+            key,
+            pks,
+            blokname=blokname,
+            raiseifexist=raiseifexist,
+        )
 
     @classmethod
     def get(cls, model, key):
-        """ return instance of the model with this external key
+        """return instance of the model with this external key
 
         :param model: model of the mapping
         :param key: string of the key
@@ -274,7 +286,8 @@ class Mapping:
     @classmethod
     def get_from_entry(cls, entry):
         return cls.get_from_model_and_primary_keys(
-            entry.__registry_name__, entry.to_primary_keys())
+            entry.__registry_name__, entry.to_primary_keys()
+        )
 
     @classmethod
     def __get_models(cls, models):
@@ -290,8 +303,10 @@ class Mapping:
         elif not isinstance(models, (list, tuple)):
             models = [models]
 
-        return [m.__registry_name__ if hasattr(m, '__registry_name__') else m
-                for m in models]
+        return [
+            m.__registry_name__ if hasattr(m, "__registry_name__") else m
+            for m in models
+        ]
 
     @classmethod
     def clean(cls, bloknames=None, models=None):

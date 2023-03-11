@@ -26,7 +26,7 @@ AnyBlok is hosted on `github <http://github.com>`_ - the main project
 page is at http://github.com/AnyBlok/anyblok_io. Source code is tracked here
 using `GIT <https://git-scm.com>`_.
 
-Releases and project status are available on Pypi at 
+Releases and project status are available on Pypi at
 http://pypi.python.org/pypi/anyblok_io.
 
 The most recent published version of this documentation should be at
@@ -35,7 +35,7 @@ https://anyblok-io.readthedocs.io/en/latest/.
 Installation
 ------------
 
-Install released versions of AnyBlok from the Python package index with 
+Install released versions of AnyBlok from the Python package index with
 `pip <http://pypi.python.org/pypi/pip>`_ or a similar tool::
 
     pip install anyblok_io
@@ -81,5 +81,5 @@ Contributors
 Bugs
 ----
 
-Bugs and feature enhancements to AnyBlok should be reported on the `Issue 
+Bugs and feature enhancements to AnyBlok should be reported on the `Issue
 tracker <https://github.com/AnyBlok/anyblok_io/issues>`_.

@@ -11,18 +11,20 @@ from anyblok.column import Integer, Selection, String
 
 @Declarations.register(Declarations.Mixin)
 class IOMixin:
-
     id = Integer(primary_key=True)
     mode = Selection(selections="get_mode_choices", nullable=False)
-    model = String(foreign_key=Declarations.Model.System.Model.use('name'),
-                   nullable=False, size=256)
+    model = String(
+        foreign_key=Declarations.Model.System.Model.use("name"),
+        nullable=False,
+        size=256,
+    )
 
     @classmethod
     def get_mode_choices(cls):
         return {}
 
     def get_formater(self, ctype):
-        formater_name = 'Model.IO.Formater.' + ctype
+        formater_name = "Model.IO.Formater." + ctype
         if self.anyblok.has(formater_name):
             return self.anyblok.get(formater_name)()
         else:

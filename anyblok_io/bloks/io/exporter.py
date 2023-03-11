@@ -6,24 +6,25 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok import Declarations
+
 from .exceptions import ExporterException
 
 
 @Declarations.register(Declarations.Model.IO)
 class Exporter(Declarations.Mixin.IOMixin):
-
     def run(self, entries):
         for entry in entries:
             if entry.__registry_name__ != self.model:
                 raise ExporterException(
-                    "The entries must be instance of %r" % self.model)
+                    "The entries must be instance of %r" % self.model
+                )
 
         return self.get_model(self.mode)(self).run(entries)
 
     @classmethod
     def get_external_id(cls, model):
         Sequence = cls.anyblok.System.Sequence
-        seq_code = 'export.%s' % model
+        seq_code = "export.%s" % model
         query = Sequence.query().filter(Sequence.code == seq_code)
         if query.count():
             sequence = query.first()

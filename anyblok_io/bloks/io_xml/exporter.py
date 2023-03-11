@@ -7,33 +7,30 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok import Declarations
 
-
 register = Declarations.register
 IO = Declarations.Model.IO
 
 
 @register(IO)
 class Exporter:
-
     @classmethod
     def get_mode_choices(cls):
         res = super(Exporter, cls).get_mode_choices()
-        res.update({'Model.IO.Exporter.XML': 'XML'})
+        res.update({"Model.IO.Exporter.XML": "XML"})
         return res
 
 
 @register(IO.Exporter)
 class XML:
-
     def __init__(self, exporter):
         self.exporter = exporter
 
     @classmethod
     def insert(cls, delimiter=None, quotechar=None, fields=None, **kwargs):
-        kwargs['mode'] = cls.__registry_name__
-        if 'model' in kwargs:
-            if not isinstance(kwargs['model'], str):
-                kwargs['model'] = kwargs['model'].__registry_name__
+        kwargs["mode"] = cls.__registry_name__
+        if "model" in kwargs:
+            if not isinstance(kwargs["model"], str):
+                kwargs["model"] = kwargs["model"].__registry_name__
 
         return cls.anyblok.IO.Exporter.insert(**kwargs)
 

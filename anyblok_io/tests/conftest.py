@@ -9,6 +9,7 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 import pytest  # noqa
 from anyblok.tests.conftest import *  # noqa
+
 # from anyblok.tests.conftest import init_registry_with_bloks
 
 
