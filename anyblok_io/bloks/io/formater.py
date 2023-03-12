@@ -46,7 +46,7 @@ class Formater:
         Mapping = self.anyblok.IO.Mapping
         pks = Model.get_primary_keys()
         if len(pks) > 1:
-            raise FormaterException(
+            raise FormaterException(  # pragma: no cover
                 "Foreign key on multi primary keys does not implemented yet"
             )
 
@@ -158,7 +158,7 @@ class Many2One(IO.Formater):
 
         return Model.from_primary_keys(**pks)
 
-    def externalIdStr2value(self, value, model):
+    def externalIdStr2value(self, value, model, fieldname):
         if not value:
             return None
 
@@ -200,7 +200,7 @@ class Many2Many(IO.Formater):
 
         return [Model.from_primary_keys(**x) for x in pks if x]
 
-    def externalIdStr2value(self, values, model):
+    def externalIdStr2value(self, values, model, fieldname):
         if not values or values == "null":
             return []
 

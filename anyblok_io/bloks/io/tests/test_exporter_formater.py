@@ -225,3 +225,12 @@ class TestExporterFormater:
             model.name, "String", external_id=True, model="Model.System.Model"
         )
         assert value == key
+
+    def test_external_id_without_existing_mapping(self):
+        model = self.registry.System.Model.from_primary_keys(
+            name="Model.System.Model"
+        )
+        value = self.get_value(
+            model.name, "String", external_id=True, model="Model.System.Model"
+        )
+        assert value

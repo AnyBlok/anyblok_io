@@ -6,6 +6,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok import Declarations
+from anyblok.mapper import ModelAttribute
 from lxml import etree
 
 from .exceptions import XMLImporterException
@@ -251,7 +252,7 @@ class XML:
 
         return None
 
-    def import_field(self, field, ctype, model=None, on_error=on_error):
+    def import_field(self, Model, field, ctype, model=None, on_error=on_error):
         model = field.attrib.get("model", model)
         param = field.attrib.get("param")
 
@@ -272,8 +273,13 @@ class XML:
                     res = self.two_way_external_id[(model, val)]
 
             if not res:
+                mapper = ModelAttribute(
+                    Model.__registry_name__, field.attrib['name']
+                )
+                fieldname = mapper.get_fk_column(self.anyblok)
                 res = self.importer.str2value(
-                    val, ctype, external_id=external_id, model=model
+                    val, ctype, external_id=external_id, model=model,
+                    fieldname=fieldname,
                 )
             if param:
                 self.params[(model, param)] = res
@@ -317,7 +323,9 @@ class XML:
             field_name = field.attrib["name"]
             field_model = fields_description[field_name]["model"]
             field_type = fields_description[field_name]["type"]
-            val = self._import_record(field, field_model, field_type, **_kw)
+            val = self._import_record(
+                Model, field, field_model, field_type, **_kw
+            )
             values[field_name] = val
 
         entry = self.import_entry(entry, values, two_way=two_way, **kwargs)
@@ -358,7 +366,7 @@ class XML:
 
         return True
 
-    def _import_record(self, field, field_model, field_type, **_kw):
+    def _import_record(self, Model, field, field_model, field_type, **_kw):
         children = field.getchildren()
 
         if children:
@@ -373,7 +381,7 @@ class XML:
 
         else:
             return self.import_field(
-                field, field_type, model=field_model, **_kw
+                Model, field, field_type, model=field_model, **_kw
             )
 
         return None

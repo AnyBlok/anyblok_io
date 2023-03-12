@@ -14,7 +14,7 @@ from ..exceptions import XMLImporterException
 
 
 @pytest.mark.usefixtures("rollback_registry")
-class TestImportCSV:
+class TestImportXML:
     @pytest.fixture(autouse=True)
     def transact(self, rollback_registry):
         self.registry = rollback_registry
@@ -314,28 +314,35 @@ class TestImportCSV:
         field = etree.Element("field")
         field.set("name", "model")
         field.text = "Model.IO.Importer"
-        assert importer.import_field(field, "String") == field.text
+        assert importer.import_field(
+            self.registry.IO.Importer, field, "String") == field.text
 
     def test_import_field_external_id(self):
         importer = self.create_XML_importer()
         model = "Model.IO.Importer"
-        self.registry.IO.Mapping.set("test_import", importer.importer)
+        _model = self.registry.System.Model.query().get(model)
+        self.registry.IO.Mapping.set("test_import", _model)
         field = etree.Element("field")
         field.set("name", "model")
         field.set("external_id", "test_import")
         assert (
-            importer.import_field(field, "String", model=model)
-            == importer.importer.id
+            importer.import_field(
+                self.registry.IO.Importer, field, "String",
+                model='Model.System.Model',
+            ) == model
         )
         assert len(importer.error_found) == 0
 
     def test_import_field_external_id_without_model(self):
         importer = self.create_XML_importer()
-        self.registry.IO.Mapping.set("test_import", importer.importer)
+        model = "Model.IO.Importer"
+        _model = self.registry.System.Model.query().get(model)
+        self.registry.IO.Mapping.set("test_import", _model)
         field = etree.Element("field")
         field.set("name", "model")
         field.set("external_id", "test_import")
-        assert importer.import_field(field, "String") is None
+        assert importer.import_field(
+            self.registry.IO.Importer, field, "String") is None
         assert len(importer.error_found) == 1
 
     def test_import_field_params(self):
@@ -345,7 +352,9 @@ class TestImportCSV:
         field = etree.Element("field")
         field.set("name", "model")
         field.set("param", "test_import")
-        assert importer.import_field(field, "String", model=model) == importer
+        assert importer.import_field(
+            self.registry.IO.Importer, field, "String", model=model
+        ) == importer
         assert len(importer.error_found) == 0
 
     def test_import_field_inexisting_params(self):
@@ -356,7 +365,9 @@ class TestImportCSV:
         field.set("name", "model")
         field.set("param", "test_import")
         field.text = "Model.IO.Importer"
-        assert importer.import_field(field, "String", model=model) == field.text
+        assert importer.import_field(
+            self.registry.IO.Importer, field, "String", model=model
+        ) == field.text
         assert len(importer.error_found) == 0
         assert importer.params[(model, "test_import")] == field.text
 
@@ -367,7 +378,8 @@ class TestImportCSV:
         field = etree.Element("field")
         field.set("name", "model")
         field.set("param", "test_import")
-        assert importer.import_field(field, "String") is None
+        assert importer.import_field(
+            self.registry.IO.Importer, field, "String") is None
         assert len(importer.error_found) == 1
 
     def test_import_record_without_model(self):

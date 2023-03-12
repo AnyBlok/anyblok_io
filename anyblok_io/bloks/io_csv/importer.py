@@ -177,7 +177,7 @@ class CSV:
                 ctype = self.fields_description[field]["type"]
                 model = self.fields_description[field]["model"]
                 mapper = ModelAttribute(self.importer.model, field)
-                fieldname = mapper.get_fk_remote(self.anyblok)
+                fieldname = mapper.get_fk_column(self.anyblok)
                 values[field] = self.importer.str2value(
                     row[external_field], ctype, external_id=True, model=model,
                     fieldname=fieldname,
