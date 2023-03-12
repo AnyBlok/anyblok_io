@@ -89,7 +89,7 @@ class TestIOMapping:
     def test_set_primary_keys_without_pks(self):
         column = self.Column.query().first()
         with pytest.raises(IOMappingSetException):
-            res = self.Mapping.set_primary_keys(
+            self.Mapping.set_primary_keys(
                 column.__registry_name__,
                 "test_set_pks",
                 dict(),
