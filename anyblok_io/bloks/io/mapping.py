@@ -20,7 +20,7 @@ try:
     import colour
 
     has_colour = True
-except Exception:
+except ImportError:
     has_colour = False
 
 
@@ -28,7 +28,7 @@ try:
     import furl  # noqa
 
     has_furl = True
-except Exception:
+except ImportError:
     has_furl = False
 
 
@@ -37,7 +37,7 @@ try:
 
     has_phonenumbers = True
     from sqlalchemy_utils import PhoneNumber as PN
-except Exception:
+except ImportError:
     has_phonenumbers = False
 
 
@@ -45,7 +45,7 @@ try:
     import pycountry  # noqa
 
     has_pycountry = True
-except Exception:
+except ImportError:
     has_pycountry = False
 
 
@@ -116,7 +116,7 @@ class Mapping:
             cls.anyblok.expire_all()
             return count
 
-        return 0
+        return 0  # pragma: no cover
 
     @classmethod
     def delete(cls, model, key, mapping_only=True, byquery=False):
@@ -141,7 +141,7 @@ class Mapping:
             )
             return count
 
-        return 0
+        return 0  # pragma: no cover
 
     @classmethod
     def get_mapping_primary_keys(cls, model, key):

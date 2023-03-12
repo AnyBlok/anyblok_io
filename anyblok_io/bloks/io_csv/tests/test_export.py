@@ -114,6 +114,16 @@ class TestExportCSV:
         res = exporter.fields_to_export[0].value2str(exporter, exporter)
         assert res == key
 
+    def test_format_browsed_field_with_mapping_Many2One(self):
+        Field = self.registry.IO.Exporter.Field
+        fields = [{"name": "exporter.id", "mode": "external_id"}]
+        exporter = self.create_exporter(Field, fields=fields)
+        key = self.registry.IO.Exporter.get_key_mapping(exporter)
+        res = exporter.fields_to_export[0].value2str(
+            exporter, exporter.fields_to_export[0]
+        )
+        assert res == key
+
     def test_export_anyblok_core(self):
         Blok = self.registry.System.Blok
         fields = [{"name": "name", "mode": "external_id"}, {"name": "state"}]
@@ -144,3 +154,11 @@ class TestExportCSV:
         exporter = self.create_exporter(Blok, fields=fields)
         bloks = Blok.query().all()
         exporter.run(bloks)
+
+    def test_export_anyblok_core_wrong_field(self):
+        Blok = self.registry.System.Blok
+        fields = [{"name": "name", "mode": "external_id"}, {"name": "wrong"}]
+        exporter = self.create_exporter(Blok, fields=fields)
+        blok = Blok.from_primary_keys(name="anyblok-core")
+        with pytest.raises(CSVExporterException):
+            exporter.run([blok])

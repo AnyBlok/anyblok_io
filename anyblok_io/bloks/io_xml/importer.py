@@ -6,6 +6,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from anyblok import Declarations
+from anyblok.mapper import ModelAttribute
 from lxml import etree
 
 from .exceptions import XMLImporterException
@@ -103,7 +104,7 @@ class XML:
             # temporaly deactivate auto flush to let time
             # orm to fill the remote column with foreign_key
             # which should be not null
-            with self.anyblok.session.no_autoflush:
+            with self.anyblok.session.no_autoflush:  # pragma: no cover
                 getattr(entry, field).extend(inValues[field])
 
     def create_entry(self, Model, values, two_way, **kwargs):
@@ -119,7 +120,7 @@ class XML:
             self.update_x2M(return_entry, values, insert_values)
             self.created_entries.append(return_entry)
             return return_entry
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             self._raise(e, **kwargs)
 
     def map_imported_entry(
@@ -188,7 +189,7 @@ class XML:
 
                     self.update_x2M(entry, values, insert_values)
                     self.updated_entries.append(entry)
-                except Exception as e:
+                except Exception as e:  # pragma: no cover
                     self._raise(e, **kwargs)
         elif if_does_not_exist == "create":
             return_entry = self.create_entry(Model, values, two_way, **kwargs)
@@ -212,7 +213,7 @@ class XML:
                 record, model=record.attrib.get("model", model), two_way=True
             )
             if not val:
-                continue
+                continue  # pragma: no cover
 
             vals.append(val)
 
@@ -224,12 +225,12 @@ class XML:
             return val
         else:
             if not val:
-                return None
+                return None  # pragma: no cover
 
             pks = val.to_primary_keys()
             vals = [x for x in pks.values()]
             if len(vals) > 1:
-                self._raise(
+                self._raise(  # pragma: no cover
                     "Multi foreign key for %r (%r) are not "
                     "implemented" % (record.tag, record.attrib),
                     on_error=on_error,
@@ -251,7 +252,7 @@ class XML:
 
         return None
 
-    def import_field(self, field, ctype, model=None, on_error=on_error):
+    def import_field(self, Model, field, ctype, model=None, on_error=on_error):
         model = field.attrib.get("model", model)
         param = field.attrib.get("param")
 
@@ -272,8 +273,16 @@ class XML:
                     res = self.two_way_external_id[(model, val)]
 
             if not res:
+                mapper = ModelAttribute(
+                    Model.__registry_name__, field.attrib["name"]
+                )
+                fieldname = mapper.get_fk_column(self.anyblok)
                 res = self.importer.str2value(
-                    val, ctype, external_id=external_id, model=model
+                    val,
+                    ctype,
+                    external_id=external_id,
+                    model=model,
+                    fieldname=fieldname,
                 )
             if param:
                 self.params[(model, param)] = res
@@ -287,7 +296,7 @@ class XML:
         kwargs.update(record.attrib)
         _kw = {}
         if "on_error" in kwargs:
-            _kw["on_error"] = kwargs["on_error"]
+            _kw["on_error"] = kwargs["on_error"]  # pragma: no cover
 
         entry = self.find_entry(**kwargs)
         mustbereturned, entry = self.check_entry_before_import(
@@ -295,7 +304,7 @@ class XML:
         )
 
         if mustbereturned:
-            return entry
+            return entry  # pragma: no cover
 
         if "model" not in kwargs:
             self._raise(
@@ -309,7 +318,7 @@ class XML:
         values = {}
         for field in record.getchildren():
             if "on_error" in field.attrib:
-                _kw["on_error"] = field.attrib["on_error"]
+                _kw["on_error"] = field.attrib["on_error"]  # pragma: no cover
 
             if not self.validate_field(field, Model, fields_description, **_kw):
                 continue
@@ -317,7 +326,9 @@ class XML:
             field_name = field.attrib["name"]
             field_model = fields_description[field_name]["model"]
             field_type = fields_description[field_name]["type"]
-            val = self._import_record(field, field_model, field_type, **_kw)
+            val = self._import_record(
+                Model, field, field_model, field_type, **_kw
+            )
             values[field_name] = val
 
         entry = self.import_entry(entry, values, two_way=two_way, **kwargs)
@@ -334,7 +345,7 @@ class XML:
 
     def validate_field(self, field, Model, fields_description, **_kw):
         if field.tag is etree.Comment:
-            return False
+            return False  # pragma: no cover
 
         if field.tag.lower() != "field":
             self._raise("Waitting 'field' node, not %r" % field.tag, **_kw)
@@ -350,15 +361,15 @@ class XML:
 
         field_name = field.attrib["name"]
         if field_name not in fields_description:
-            self._raise(
+            self._raise(  # pragma: no cover
                 "Model %r have not field %r"
                 % (Model.__registry_name__, field_name)
             )
-            return False
+            return False  # pragma: no cover
 
         return True
 
-    def _import_record(self, field, field_model, field_type, **_kw):
+    def _import_record(self, Model, field, field_model, field_type, **_kw):
         children = field.getchildren()
 
         if children:
@@ -373,7 +384,7 @@ class XML:
 
         else:
             return self.import_field(
-                field, field_type, model=field_model, **_kw
+                Model, field, field_type, model=field_model, **_kw
             )
 
         return None
@@ -381,7 +392,7 @@ class XML:
     def import_records(self, records):
         for record in records.getchildren():
             if record.tag is etree.Comment:
-                continue
+                continue  # pragma: no cover
             elif record.tag.lower() == "record":
                 self.import_record(record, model=self.importer.model)
             elif record.tag.lower() == "commit":

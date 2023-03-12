@@ -12,13 +12,13 @@ from uuid import uuid1
 import pytest
 from sqlalchemy import text
 
-from ..exceptions import IOMappingSetException
+from ..exceptions import IOMappingCheckException, IOMappingSetException
 
 try:
     import colour
 
     has_colour = True
-except Exception:
+except ImportError:
     has_colour = False
 
 
@@ -26,7 +26,7 @@ try:
     import furl  # noqa
 
     has_furl = True
-except Exception:
+except ImportError:
     has_furl = False
 
 
@@ -35,7 +35,7 @@ try:
 
     has_phonenumbers = True
     from sqlalchemy_utils import PhoneNumber as PN
-except Exception:
+except ImportError:
     has_phonenumbers = False
 
 
@@ -43,7 +43,7 @@ try:
     import pycountry  # noqa
 
     has_pycountry = True
-except Exception:
+except ImportError:
     has_pycountry = False
 
 
@@ -85,6 +85,15 @@ class TestIOMapping:
         assert mapping == res
         assert mapping.model == column.__registry_name__
         assert mapping.primary_key == dict(model=column.model, name=column.name)
+
+    def test_set_primary_keys_without_pks(self):
+        column = self.Column.query().first()
+        with pytest.raises(IOMappingSetException):
+            self.Mapping.set_primary_keys(
+                column.__registry_name__,
+                "test_set_pks",
+                dict(),
+            )
 
     def test_set(self):
         column = self.Column.query().first()
@@ -168,6 +177,30 @@ class TestIOMapping:
         column = self.Column.query().first()
         self.Mapping.set("test_set", column)
         self.Mapping.set("test_set", column, raiseifexist=False)
+
+    def test_multi_delete_only_mapping(self):
+        columns = {
+            "test_%s" % m.code: m for m in self.Column.query().limit(5).all()
+        }
+        model = self.Column.__registry_name__
+
+        # create all
+        for key, instance in columns.items():
+            self.Mapping.set(key, instance)
+
+        # check all
+        for key, instance in columns.items():
+            mapping = self.Mapping.get(model, key)
+            assert mapping == instance
+
+        # delete all
+        self.Mapping.multi_delete(model, *columns.keys(), mapping_only=False)
+
+        # check all
+        for key, instance in columns.items():
+            mapping = self.Mapping.get(model, key)
+            assert mapping != instance
+            assert mapping is None
 
     def test_clean_all(self):
         blok = self.Blok.insert(name="Test", version="0.0.0")
@@ -408,3 +441,7 @@ class TestIOMapping:
     def test_convert_primary_key_color(self):
         color = "#f5f5f5"
         assert self.Mapping.convert_primary_key(colour.Color(color)) == color
+
+    def test_check_wrong_primary_keys(self):
+        with pytest.raises(IOMappingCheckException):
+            self.Mapping.check_primary_keys("Model.System.Model", "id")
