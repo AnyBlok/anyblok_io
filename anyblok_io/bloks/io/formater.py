@@ -114,7 +114,8 @@ class Boolean(IO.Formater):
             return False
 
         raise FormaterException(  # pragma: no cover
-            "Value %r is not a boolean" % value)
+            "Value %r is not a boolean" % value
+        )
 
     def value2str(self, value, model):
         return "1" if value else "0"

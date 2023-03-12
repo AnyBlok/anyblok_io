@@ -120,7 +120,8 @@ class TestExportCSV:
         exporter = self.create_exporter(Field, fields=fields)
         key = self.registry.IO.Exporter.get_key_mapping(exporter)
         res = exporter.fields_to_export[0].value2str(
-            exporter, exporter.fields_to_export[0])
+            exporter, exporter.fields_to_export[0]
+        )
         assert res == key
 
     def test_export_anyblok_core(self):

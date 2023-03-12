@@ -274,11 +274,14 @@ class XML:
 
             if not res:
                 mapper = ModelAttribute(
-                    Model.__registry_name__, field.attrib['name']
+                    Model.__registry_name__, field.attrib["name"]
                 )
                 fieldname = mapper.get_fk_column(self.anyblok)
                 res = self.importer.str2value(
-                    val, ctype, external_id=external_id, model=model,
+                    val,
+                    ctype,
+                    external_id=external_id,
+                    model=model,
                     fieldname=fieldname,
                 )
             if param:

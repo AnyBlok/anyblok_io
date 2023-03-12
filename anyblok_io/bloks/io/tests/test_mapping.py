@@ -12,7 +12,7 @@ from uuid import uuid1
 import pytest
 from sqlalchemy import text
 
-from ..exceptions import IOMappingSetException, IOMappingCheckException
+from ..exceptions import IOMappingCheckException, IOMappingSetException
 
 try:
     import colour
@@ -444,4 +444,4 @@ class TestIOMapping:
 
     def test_check_wrong_primary_keys(self):
         with pytest.raises(IOMappingCheckException):
-            self.Mapping.check_primary_keys('Model.System.Model', 'id')
+            self.Mapping.check_primary_keys("Model.System.Model", "id")

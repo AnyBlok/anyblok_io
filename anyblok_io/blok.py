@@ -22,7 +22,8 @@ class BlokImporter:
     def import_file_csv(self, model, *file_path, **kwargs):
         if not self.anyblok.System.Blok.is_installed("anyblok-io-csv"):
             raise BlokImporterException(
-                "anyblok-io-csv is not installed in the project")
+                "anyblok-io-csv is not installed in the project"
+            )
 
         Importer = self.anyblok.IO.Importer.CSV
         return self.import_file(Importer, model, *file_path, **kwargs)
@@ -30,7 +31,8 @@ class BlokImporter:
     def import_file_xml(self, model, *file_path, **kwargs):
         if not self.anyblok.System.Blok.is_installed("anyblok-io-xml"):
             raise BlokImporterException(
-                "anyblok-io-xml is not installed in the project")
+                "anyblok-io-xml is not installed in the project"
+            )
 
         Importer = self.anyblok.IO.Importer.XML
         return self.import_file(Importer, model, *file_path, **kwargs)

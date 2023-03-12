@@ -6,11 +6,11 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 import pytest
+
 from anyblok_io.blok import BlokImporterException
 
 
 class TestBlok:
-
     @pytest.fixture(autouse=True)
     def transact(self, request, registry_testblok):
         transaction = registry_testblok.begin_nested()
@@ -27,14 +27,12 @@ class TestBlok:
 
 
 class TestBlok2:
-
     def test_import_file_csv_ko(self, registry_testblok):
         with pytest.raises(BlokImporterException):
             registry_testblok.upgrade(install=("test-io-blok3",))
 
 
 class TestBlok3:
-
     def test_import_file_xml_ko(self, registry_testblok):
         with pytest.raises(BlokImporterException):
             registry_testblok.upgrade(install=("test-io-blok4",))
