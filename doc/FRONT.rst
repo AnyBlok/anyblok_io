@@ -40,9 +40,6 @@ Install released versions of AnyBlok from the Python package index with
 
     pip install anyblok_io
 
-Installation via source distribution is via the ``setup.py`` script::
-
-    python setup.py install
 
 Running Tests
 -------------
@@ -51,17 +48,20 @@ Running Tests
 ..              <basedoc_tests>`.
 
 
-To run framework tests with ``nose``::
+To run framework tests with ``pytest`` and ``PostgreSQL``::
 
-    pip install nose
-    nosetests anyblok_io/tests
+    pip install pytest pytest-cov
+    ANYBLOK_DATABASE_DRIVER=postgresql ANYBLOK_DATABASE_NAME=anyblok_test pytest anyblok_io/tests
 
-To run tests of all installed bloks::
+To run bloks tests with ``pytest`` and ``PostgreSQL``::
 
-    anyblok_nose -c config.file.cfg
 
-AnyBlok is tested continuously using `Travis CI
-<https://travis-ci.org/AnyBlok/anyblok_io>`_
+    pip install pytest pytest-cov
+    ANYBLOK_DATABASE_DRIVER=postgresql ANYBLOK_DATABASE_NAME=anyblok_test anyblok_createdb --install-all-bloks
+    ANYBLOK_DATABASE_DRIVER=postgresql ANYBLOK_DATABASE_NAME=anyblok_test pytest anyblok_io/tests
+
+
+AnyBlok is tested continuously using Github actions
 
 Contributing (hackers needed!)
 ------------------------------
