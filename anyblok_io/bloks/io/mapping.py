@@ -12,7 +12,6 @@ from uuid import UUID
 
 from anyblok.column import Json, String
 from anyblok.declarations import Declarations, hybrid_method
-from sqlalchemy import func
 
 from .exceptions import IOMappingCheckException, IOMappingSetException
 
@@ -100,23 +99,18 @@ class Mapping:
         byquery = kwargs.get("byquery", False)
 
         filter_ = cls.filter_by_model_and_keys(model, *keys)
-        count = cls.execute_sql_statement(
-            cls.select_sql_statement(func.count()).where(filter_)
-        ).scalar()
+        if not mapping_only:
+            entries = cls.execute_sql_statement(
+                cls.select_sql_statement().where(filter_)
+            ).scalars()
+            for entry in entries:
+                entry.remove_element(byquery=byquery)
 
-        if count:
-            if not mapping_only:
-                cls.execute_sql_statement(
-                    cls.select_sql_statement().where(filter_)
-                ).scalar().remove_element(byquery=byquery)
-
-            cls.execute_sql_statement(
-                cls.delete_sql_statement().where(filter_), remove_mapping=False
-            )
-            cls.anyblok.expire_all()
-            return count
-
-        return 0  # pragma: no cover
+        res = cls.execute_sql_statement(
+            cls.delete_sql_statement().where(filter_), remove_mapping=False
+        )
+        cls.anyblok.expire_all()
+        return res.rowcount
 
     @classmethod
     def delete(cls, model, key, mapping_only=True, byquery=False):
@@ -127,21 +121,17 @@ class Mapping:
         :rtype: Boolean True if the mapping is removed
         """
         filter_ = cls.filter_by_model_and_key(model, key)
-        count = cls.execute_sql_statement(
-            cls.select_sql_statement(func.count()).where(filter_)
-        ).scalar()
-        if count:
-            if not mapping_only:
-                cls.execute_sql_statement(
-                    cls.select_sql_statement().where(filter_)
-                ).scalar().remove_element(byquery=byquery)
+        if not mapping_only:
+            entry = cls.execute_sql_statement(
+                cls.select_sql_statement().where(filter_)
+            ).scalar()
+            if entry:
+                entry.remove_element(byquery=byquery)
 
-            cls.execute_sql_statement(
-                cls.delete_sql_statement().where(filter_), remove_mapping=False
-            )
-            return count
-
-        return 0  # pragma: no cover
+        res = cls.execute_sql_statement(
+            cls.delete_sql_statement().where(filter_), remove_mapping=False
+        )
+        return res.rowcount
 
     @classmethod
     def get_mapping_primary_keys(cls, model, key):
@@ -151,14 +141,16 @@ class Mapping:
         :param key: string of the key
         :rtype: dict primary key: value or None
         """
-        query = cls.query()
-        query = query.filter(cls.filter_by_model_and_key(model, key))
-        if query.count():
-            pks = query.first().primary_key
-            cls.check_primary_keys(model, *pks.keys())
-            return pks
+        filter_ = cls.filter_by_model_and_key(model, key)
+        pks = cls.execute_sql_statement(
+            cls.select_sql_statement(cls.primary_key).where(filter_)
+        ).scalars().one_or_none()
 
-        return None
+        if not pks:
+            return None
+
+        cls.check_primary_keys(model, *pks.keys())
+        return pks
 
     @classmethod
     def check_primary_keys(cls, model, *pks):
@@ -277,7 +269,7 @@ class Mapping:
     @classmethod
     def get_from_model_and_primary_keys(cls, model, pks):
         query = cls.query().filter(cls.model == model)
-        for mapping in query.all():
+        for mapping in query:
             if mapping.primary_key == pks:
                 return mapping
 
