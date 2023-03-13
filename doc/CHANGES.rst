@@ -14,6 +14,8 @@ CHANGELOG
 ------------------
 
 * Put on github action
+* Used pre commit hook
+* Increased velocity in mapping
 
 1.2.0 (2021-08-16)
 ------------------
