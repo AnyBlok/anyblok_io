@@ -142,9 +142,13 @@ class Mapping:
         :rtype: dict primary key: value or None
         """
         filter_ = cls.filter_by_model_and_key(model, key)
-        pks = cls.execute_sql_statement(
-            cls.select_sql_statement(cls.primary_key).where(filter_)
-        ).scalars().one_or_none()
+        pks = (
+            cls.execute_sql_statement(
+                cls.select_sql_statement(cls.primary_key).where(filter_)
+            )
+            .scalars()
+            .one_or_none()
+        )
 
         if not pks:
             return None
